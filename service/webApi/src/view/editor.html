@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<!--mermaidのリアルタイムレンダリング-->
+<html lang="ja" x-data="{ diagram: '', timeout: null }">
+<head>
+  <meta charset="UTF-8">
+  <title>Mermaid Render with Alpine.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" defer></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+    window.initializeMermaid = () => {
+      mermaid.initialize({ startOnLoad: false });
+    };
+
+    window.renderMermaidDiagram = async (diagram, containerId) => {
+      try {
+        const container = document.getElementById(containerId);
+        const { svg } = await mermaid.render('mermaidExample', diagram);
+        container.innerHTML = svg;
+      } catch (error) {
+        console.error('Error rendering Mermaid diagram:', error);
+      }
+    };
+  </script>
+</head>
+<body class="bg-gray-100 font-sans" x-data="{ 
+      diagram: `sequenceDiagram
+    autonumber
+    Alice->>John: Hello John, how are you?
+    loop HealthCheck
+        John->>John: Fight against hypochondria
+    end
+    Note right of John: Rational thoughts!
+    John-->>Alice: Great!
+    John->>Bob: How about you?
+    Bob-->>John: Jolly good!`,
+      timeout: null,
+      updateDiagram() {
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(() => {
+          renderMermaidDiagram(this.diagram, 'svgContainer');
+        }, 1000);
+      },
+      init() {
+        window.addEventListener('load', () => {
+	  window.initializeMermaid()
+	  this.updateDiagram()
+	})
+      }
+    }" x-init="init()">
+
+        <div class="w-full grid grid-cols-2 gap-6 bg-white shadow-lg rounded-lg p-6">
+            <!-- 左側: テキストエリア -->
+            <div>
+                <textarea id="mermaid-input" class="w-full min-h-screen border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3" placeholder="graph TD&#10;A[Start] --> B[Process] --> C[End]"
+    x-model="diagram" 
+    @input="updateDiagram()"
+			></textarea>
+            </div>
+
+            <!-- 右側: グラフ表示 -->
+            <div>
+                <label class="block text-lg font-medium text-gray-700 mb-2">グラフプレビュー:</label>
+                <div class="w-full border border-gray-300 rounded-lg shadow-sm overflow-auto bg-gray-50 p-3 min-h-screen">
+                    <div id="svgContainer"></div>
+                </div>
+            </div>
+        </div>
+
+</body>
+</html>
+

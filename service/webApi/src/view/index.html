@@ -1,0 +1,129 @@
+<!DOCTYPE HTML>
+<!--mermaidのリアルタイムレンダリングとchatgptとUI調整-->
+<html lang='ja'>
+<head>
+  <meta charset='UTF-8'>
+  <title>Mermaid Render with Alpine.js</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <script src='https://cdn.tailwindcss.com'></script>
+  <script src='https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js' defer></script>
+  <script type='module'>
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+    window.initializeMermaid = () => {
+      mermaid.initialize({ startOnLoad: false });
+    };
+
+    window.renderMermaidDiagram = async (diagram, containerId) => {
+      try {
+        const container = document.getElementById(containerId);
+        const { svg } = await mermaid.render('mermaidExample', diagram);
+        container.innerHTML = svg;
+      } catch (error) {
+        console.error('Error rendering Mermaid diagram:', error);
+      }
+    };
+  </script>
+</head>
+<body class='bg-gray-100 font-sans' x-data="{ 
+      diagram: `sequenceDiagram
+    autonumber
+    Alice->>John: Hello John, how are you?
+    loop HealthCheck
+        John->>John: Fight against hypochondria
+    end
+    Note right of John: Rational thoughts!
+    John-->>Alice: Great!
+    John->>Bob: How about you?
+    Bob-->>John: Jolly good!`,
+      timeout: null,
+      inputText: '',
+      chatList: [],
+      updateDiagram() {
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(() => {
+          renderMermaidDiagram(this.diagram, 'svgContainer');
+        }, 1000);
+      },
+      init() {
+        window.addEventListener('load', () => {
+	  window.initializeMermaid()
+	  this.updateDiagram()
+	})
+      },
+      scrollChatListContainer() {
+       setTimeout(() => {
+	  this.$refs.chatListContainer.scrollTop = this.$refs.chatListContainer.scrollHeight;
+	}, 1*1000)
+      },
+async sendMessage() {
+    if (!this.inputText.trim()) return;
+    const newMessage = { role: 'user', content: this.inputText };
+    this.chatList.push(newMessage);
+    this.scrollChatListContainer();
+
+    // Keep only the last 3 chat pairs
+    const messagesToSend = this.chatList.slice(-6);
+    this.inputText = '';
+
+    try {
+	const response = await fetch('/api/postMessage', {
+	    method: 'POST',
+	    headers: { 'Content-Type': 'application/json' },
+	    body: JSON.stringify({ chatList: messagesToSend }),
+	});
+
+	const data = await response.json();
+	const botReply = { role: 'assistant', content: data.result };
+	this.chatList.push(botReply);
+	this.scrollChatListContainer();
+	
+
+	// Extract mermaid code
+	const mermaidMatch = data.result.match(/```mermaid\n([\s\S]*?)\n```/);
+	if (mermaidMatch) {
+	    this.diagram = mermaidMatch[1];
+	    this.updateDiagram()
+	}
+    } catch (error) {
+    console.error('Error:', error);
+    const stack = error.stack;
+    const atIndex = stack.indexOf('at ');
+    const result = atIndex !== -1 ? stack.slice(0, atIndex).trim() : stack;
+    alert(result);
+    }
+
+		      }
+
+    }" x-init='init()'>
+
+    <div class="flex h-full">
+        <!-- Chat UI -->
+        <div x-ref="chatListContainer" class="w-1/2 h-screen p-4 bg-white border-r overflow-y-auto">
+            <div class="flex flex-col gap-4">
+                <template x-for="(message, index) in chatList" :key="index">
+                    <div :class="message.role === 'user' ? 'text-right' : 'text-left'">
+                        <div :class="message.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'"
+                            class="inline-block p-2 rounded-lg">
+                            <pre class="whitespace-pre-wrap" x-text="message.content"></pre>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            <div class="mt-4 flex">
+                <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage"
+                    class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。">
+		</textarea>
+                <button @click="sendMessage"
+                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Send</button>
+            </div>
+        </div>
+
+        <!-- Mermaid Display -->
+        <div class="w-1/2 h-screen p-4">
+            <div id="svgContainer" class="bg-gray-50 border p-4 rounded-lg"></div>
+        </div>
+    </div>
+</body>
+</html>
+
