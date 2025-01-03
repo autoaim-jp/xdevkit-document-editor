@@ -22,6 +22,7 @@ docker-compose-up:
 	docker compose -p ${DOCKER_PROJECT_NAME} up
 
 docker-compose-down:
+	# docker compose -p ${DOCKER_PROJECT_NAME} down --volumes
 	docker compose -p ${DOCKER_PROJECT_NAME} down --volumes
 
 docker-compose-build:
