@@ -42,6 +42,7 @@
       chatList: [],
       chatHistoryList: [],
       menuOpen: false,
+      isMobileMode: false,
       popupIndex: null,
       renameInput: '',
       togglePopup(index) {
@@ -160,16 +161,48 @@
           console.error('Error:', error);
           alert(error.message);
         }
+      },
+      switchMobileMode() {
+        this.isMobileMode = !this.isMobileMode; 
+        if (this.isMobileMode) {
+          $refs.miniDisplayForm.classList.remove('hidden');
+          $refs.chatUiContainer.classList.add('hidden');
+          $refs.mermaidUiContainer.classList.replace('w-1/2', 'w-full');
+        } else {
+          $refs.miniDisplayForm.classList.add('hidden');
+          $refs.chatUiContainer.classList.remove('hidden');
+          $refs.mermaidUiContainer.classList.replace('w-full', 'w-1/2');
+        }
       }
     }" x-init='init()'>
 
     <div class="relative h-screen">
+      <div class="absolute bottom-20 left-2 flex flex-col space-y-2">
         <!-- Menu Button -->
-        <button @click="menuOpen = !menuOpen" class="absolute top-4 left-4 bg-gray-300 p-2 rounded-full">
+        <button @click="menuOpen = !menuOpen" class="bg-gray-300 p-2 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 6.75h16.5m-16.5 6.75h16.5" />
             </svg>
         </button>
+
+        <!-- UI Toggle Button -->
+        <button 
+            @click="switchMobileMode()"
+            class="bg-gray-300 p-2 rounded-full">
+            <template x-if="isMobileMode">
+                <!-- Icon for PC Mode -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h18v18H3V3z" />
+                </svg>
+            </template>
+            <template x-if="!isMobileMode">
+                <!-- Icon for Mobile Mode -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3h10.5c.69 0 1.25.56 1.25 1.25v15.5c0 .69-.56 1.25-1.25 1.25H6.75A1.25 1.25 0 015.5 19.75V4.25C5.5 3.56 6.06 3 6.75 3z" />
+                </svg>
+            </template>
+        </button>
+      </div>
 
         <!-- Side Menu -->
         <div x-show="menuOpen" class="absolute inset-y-0 left-0 w-80 bg-gray-200 p-4 border-r overflow-y-auto" @click.away="menuOpen = false" x-init="fetchHistoryList">
@@ -205,20 +238,20 @@
         <!-- Main Content -->
         <div class="flex h-full">
             <!-- Chat UI -->
-	      <div class="w-1/2 h-screen p-4 bg-white border-r flex flex-col">
+	      <div x-ref="chatUiContainer" class="w-1/2 h-screen p-4 bg-white border-r flex flex-col">
 		    <div class="flex-grow overflow-y-auto" x-ref="chatListContainer" x-init="$watch('chatList', () => { scrollChatListContainer() })">
-<div class="flex flex-col gap-4">
-    <template x-for="(message, index) in chatList" :key="index">
-        <!-- 外側のdivにflexと条件でjustify-end or justify-startを適用 -->
-        <div :class="message.role === 'user' ? 'flex justify-end' : 'flex justify-start'">
-            <!-- メッセージバブル -->
-            <div :class="message.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'" 
-                 class="inline-block p-2 rounded-lg max-w-[70%]">
-                <pre class="whitespace-pre-wrap" x-text="message.content"></pre>
-            </div>
+        <div class="flex flex-col gap-4">
+            <template x-for="(message, index) in chatList" :key="index">
+                <!-- 外側のdivにflexと条件でjustify-end or justify-startを適用 -->
+                <div :class="message.role === 'user' ? 'flex justify-end' : 'flex justify-start'">
+                    <!-- メッセージバブル -->
+                    <div :class="message.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'" 
+                         class="inline-block p-2 rounded-lg max-w-[70%]">
+                        <pre class="whitespace-pre-wrap" x-text="message.content"></pre>
+                    </div>
+                </div>
+            </template>
         </div>
-    </template>
-</div>
 
                 </div>
 
@@ -231,8 +264,14 @@
             </div>
 
             <!-- Mermaid Display -->
-            <div class="w-1/2 h-screen overflow-y-auto">
-                <div id="svgContainer" class="bg-gray-50 border p-4 rounded-lg"></div>
+            <div x-ref="mermaidUiContainer" class="w-1/2 h-screen overflow-y-auto">
+                <div id="svgContainer" class="bg-gray-50 border p-4 rounded-lg flex justify-center"></div>
+                <div x-ref="miniDisplayForm" class="mt-4 flex hidden">
+                    <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage"
+                        class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
+                    <button @click="sendMessage"
+                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Send</button>
+                </div>
             </div>
         </div>
     </div>
