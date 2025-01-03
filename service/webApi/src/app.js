@@ -7,6 +7,7 @@ import path from 'path'
 
 const PUBLIC_STATIC_DIR = 'view'
 const REGISTER_PROMPT = '/api/postMessage'
+const CHAT_HISTORY = '/api/getChatHistory'
 const mod = {}
 
 const _getDefaultRouter = () => {
@@ -30,6 +31,11 @@ const _getFunctionRouter = () => {
     handleRegisterPrompt: handleRegisterPrompt
   })
   expressRouter.post(REGISTER_PROMPT, registerPromptHandler)
+
+  const chatHistoryHandler = getChatHistoryHandler({
+    handleChatHistory: handleChatHistory
+  })
+  expressRouter.get(CHAT_HISTORY, chatHistoryHandler)
 
   return expressRouter
 }
@@ -56,6 +62,18 @@ const getHandlerRegisterPrompt = ({ handleRegisterPrompt }) => {
   }
 }
 
+const getChatHistoryHandler = ({ handleChatHistory }) => {
+  return async (req, res) => {
+    const { chatIdBefore } = req.query
+    console.log({ debug: true, request: 'ok!', chatIdBefore })
+
+    const handleResult = await handleChatHistory({ chatIdBefore })
+
+    res.json({ result: handleResult })
+  }
+}
+
+
 const handleRegisterPrompt = async ({ chatList }) => {
   const stream = await mod.openaiClient.chat.completions.create({
     model: 'gpt-4o',
@@ -73,6 +91,9 @@ const handleRegisterPrompt = async ({ chatList }) => {
   return responseMessage 
 }
 
+const handleChatHistory = async ({ chatIdBefore }) => {
+  return [{ chatId: 'abc', chatTitle: 'title abc', }, { chatId: 'xyz', chatTitle: 'title xyz', }]
+}
 
 const startServer = ({ app, port }) => {
   app.listen(port, () => {

@@ -10,7 +10,7 @@ services:
       - mermaid-chatgpt-editor-ma-nm:/app/node_modules
     command: sh -c "yarn run start"
     ports:
-      - 127.0.0.1:31501:31501
+      - 10.0.0.2:31501:31501
 
 volumes:
   mermaid-chatgpt-editor-ma-nm:
