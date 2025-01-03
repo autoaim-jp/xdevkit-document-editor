@@ -38,6 +38,7 @@
     Bob-->>John: Jolly good!`,
       timeout: null,
       inputText: '',
+      chatId: null,
       chatList: [],
       chatHistoryList: [],
       menuOpen: false,
@@ -55,7 +56,7 @@
       },
       async fetchHistoryList() {
         try {
-          const response = await fetch('/api/getchatHistory');
+          const response = await fetch('/api/getchatHistory?chatIdBefore=');
           const data = await response.json();
           this.chatHistoryList = data.result;
         } catch (error) {
@@ -63,6 +64,7 @@
         }
       },
       async fetchChatList(chatId) {
+        this.chatId = chatId
         try {
           const response = await fetch(`/api/getChatList?chatId=${chatId}`);
           const data = await response.json();
@@ -93,15 +95,20 @@
           const response = await fetch('/api/postMessage', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chatList: messagesToSend }),
+            body: JSON.stringify({ chatId: this.chatId, chatList: messagesToSend }),
           });
 
           const data = await response.json();
-          const botReply = { role: 'assistant', content: data.result };
-          this.chatList.push(botReply);
-	  console.log(JSON.stringify(this.chatList))
+          if (this.chatId !== data.result.chatId) {
+            this.chatId = data.result.chatId
+            this.fetchHistoryList()
+            console.log('reload history list', this.chatId)
+          }
 
-          const mermaidMatch = data.result.match(/```mermaid\n([\s\S]*?)\n```/);
+          const botReply = { role: 'assistant', content: data.result.message };
+          this.chatList.push(botReply);
+
+          const mermaidMatch = botReply.content.match(/```mermaid\n([\s\S]*?)\n```/);
           if (mermaidMatch) {
             this.diagram = mermaidMatch[1];
             this.updateDiagram();
@@ -137,7 +144,7 @@
         <div class="flex h-full">
             <!-- Chat UI -->
 	    <div class="w-1/2 h-screen p-4 bg-white border-r flex flex-col">
-		    <div class="flex-grow overflow-y-auto" x-ref="chatListContainer" x-init="$watch('chatList', () => { console.log('updated chatList'); scrollChatListContainer() })">
+		    <div class="flex-grow overflow-y-auto" x-ref="chatListContainer" x-init="$watch('chatList', () => { scrollChatListContainer() })">
                     <div class="flex flex-col gap-4">
                         <template x-for="(message, index) in chatList" :key="index">
                             <div :class="message.role === 'user' ? 'text-right' : 'text-left'">
@@ -159,7 +166,7 @@
             </div>
 
             <!-- Mermaid Display -->
-            <div class="w-1/3 h-screen p-4">
+            <div class="w-1/2 h-screen overflow-y-auto">
                 <div id="svgContainer" class="bg-gray-50 border p-4 rounded-lg"></div>
             </div>
         </div>

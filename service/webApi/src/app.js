@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import express from 'express'
+import { ulid } from 'ulid'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import { OpenAI } from 'openai'
@@ -65,10 +66,10 @@ const _getErrorRouter = () => {
 
 const getHandlerRegisterPrompt = ({ handleRegisterPrompt }) => {
   return async (req, res) => {
-    const { chatList } = req.body
+    const { chatId, chatList } = req.body
     console.log({ debug: true, request: 'ok!', chatList })
 
-    const handleResult = await handleRegisterPrompt({ chatList })
+    const handleResult = await handleRegisterPrompt({ chatId, chatList })
 
     res.json({ result: handleResult })
   }
@@ -97,7 +98,19 @@ const getChatListHandler = ({ handleChatList }) => {
 }
 
 
-const handleRegisterPrompt = async ({ chatList }) => {
+const handleRegisterPrompt = async ({ chatId, chatList }) => {
+  let currentChatId = null
+  console.log({ handleRegisterPrompt: true, chatId })
+  if (chatId) {
+    currentChatId = chatId
+  } else {
+    currentChatId = ulid()
+    await registerChatId({ chatId: currentChatId })
+  }
+
+  const prompt = chatList[chatList.length - 1].content
+  await registerChat({ chatId: currentChatId, role: 'user', content: prompt })
+
   const stream = await mod.openaiClient.chat.completions.create({
     model: 'gpt-4o',
     // model: 'gpt-3.5-turbo',
@@ -111,22 +124,45 @@ const handleRegisterPrompt = async ({ chatList }) => {
     responseMessage += part.choices[0]?.delta?.content || ''
   }
 
-  return responseMessage 
+  await registerChat({ chatId: currentChatId, role: 'assistant', content: responseMessage })
+
+  const handleResult = { chatId: currentChatId, message: responseMessage }
+  return handleResult
+}
+
+
+const registerChatId =  async ({ chatId }) => {
+  const date = new Date()
+  date.setHours(date.getHours() + 9)
+  const chatTitle = formatDate({ date })
+  const paramList = [chatId, chatTitle]
+  const query = 'insert into chat_info.chat_history (chat_id, chat_title) values ($1, $2)'
+  const { result } = await execQuery({ query, paramList })
+  const { rowCount } = result
+  return rowCount === 1? 'ok': 'ng'
+}
+
+const registerChat =  async ({ chatId, role, content }) => {
+  const paramList = [chatId, role, content]
+  const query = 'insert into chat_info.chat_list (chat_id, date_registered, role, content) values ($1, NOW(), $2, $3)'
+  const { result } = await execQuery({ query, paramList })
+  const { rowCount } = result
+  return rowCount === 1? 'ok': 'ng'
 }
 
 const handleChatHistory = async ({ chatIdBefore }) => {
   const paramList = []
   let query = ''
   if (chatIdBefore) {
-    query = 'select chat_id as chatId, chat_title as chatTitle from chat_info.chat_history where chatId <= $1 order by chatId desc'
+    query = 'select chat_id, chat_title from chat_info.chat_history where chat_id <= $1 order by chat_id desc'
     paramList.push(chatIdBefore)
   } else {
-    query = 'select chat_id as chatId, chat_title as chatTitle from chat_info.chat_history order by chatId desc'
+    query = 'select chat_id, chat_title from chat_info.chat_history order by chat_id desc'
   }
   const { result } = await execQuery({ query, paramList })
   const chatHistory = []
   result.rows.forEach((row) => {
-    const { chatId, chatTitle } = row
+    const { chatId, chatTitle } = paramSnakeToCamel({ paramList: row })
     chatHistory.push({ chatId, chatTitle })
   })
 
@@ -135,9 +171,8 @@ const handleChatHistory = async ({ chatIdBefore }) => {
 }
 
 const handleChatList = async ({ chatId }) => {
-  const paramList = []
-  const query = 'select role as role, content as content from chat_info.chat_list where chatId == $1 order by date_registered desc'
-  paramList.push(chatId)
+  const paramList = [chatId]
+  const query = 'select role, content from chat_info.chat_list where chat_id = $1 order by date_registered asc'
   const { result } = await execQuery({ query, paramList })
   const chatList = []
   result.rows.forEach((row) => {
@@ -179,13 +214,45 @@ const execQuery = async ({ query, paramList }) => {
     mod.pgPool
       .query(query, paramList)
       .then((result) => {
+        console.log({ query, paramList, rows: result.rows })
         return resolve({ err: null, result })
       })
       .catch((err) => {
-        logger.error('Error executing query', { err })
+        console.log('Error executing query', { err })
         return resolve({ err, result: null })
       })
   })
+}
+
+const formatDate = ({ format, date }) => {
+  if (format === undefined) {
+    format = 'YYYY-MM-DD hh:mm:ss'
+  }
+  if (date === undefined) {
+    date = new Date()
+  }
+
+  return format.replace(/YYYY/g, date.getFullYear())
+    .replace(/MM/g, (`0${date.getMonth() + 1}`).slice(-2))
+    .replace(/DD/g, (`0${date.getDate()}`).slice(-2))
+    .replace(/hh/g, (`0${date.getHours()}`).slice(-2))
+    .replace(/mm/g, (`0${date.getMinutes()}`).slice(-2))
+    .replace(/ss/g, (`0${date.getSeconds()}`).slice(-2))
+}
+
+const paramSnakeToCamel = ({ paramList }) => {
+  if (paramList === undefined) {
+    paramList = {}
+  }
+
+  const newParamList = {}
+  Object.entries(paramList).forEach(([key, value]) => {
+    const newKey = key.replace(/([_][a-z])/g, (group) => {
+      return group.toUpperCase().replace('_', '')
+    })
+    newParamList[newKey] = value
+  })
+  return newParamList
 }
 
 const init = async () => {
