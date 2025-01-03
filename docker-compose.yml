@@ -11,7 +11,29 @@ services:
     command: sh -c "yarn run start"
     ports:
       - 10.0.0.2:31501:31501
+    depends_on:
+      postgresql_container:
+        condition: service_healthy
+
+  postgresql_container:
+    container_name: mermaid-chatgpt-editor-postgresql
+    build:
+      context: ./ 
+      dockerfile: ./service/postgresql/docker/Dockerfile
+    volumes:
+      - mermaid-chatgpt-editor-psql:/var/lib/postgresql/data
+      - ./service/postgresql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "xl_admin", "-d", "xl_db"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
 
 volumes:
   mermaid-chatgpt-editor-ma-nm:
+  mermaid-chatgpt-editor-psql:
 
