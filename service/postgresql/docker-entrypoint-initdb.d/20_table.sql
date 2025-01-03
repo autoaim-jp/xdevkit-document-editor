@@ -3,6 +3,7 @@
 create table chat_info.chat_history (
   chat_id varchar(36),
   chat_title varchar(256) not null,
+  is_visible boolean not null default true,
   primary key(chat_id)
 );
 grant all privileges on chat_info.chat_history to xl_admin;

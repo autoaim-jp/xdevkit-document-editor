@@ -11,6 +11,8 @@ const PUBLIC_STATIC_DIR = 'view'
 const REGISTER_PROMPT = '/api/postMessage'
 const CHAT_HISTORY = '/api/getChatHistory'
 const CHAT_LIST = '/api/getChatList'
+const RENAME_CHAT = '/api/postRename'
+const DELETE_CHAT = '/api/postDelete'
 const DB_HOST = 'mermaid-chatgpt-editor-postgresql'
 const DB_PORT = 5432
 const DB_NAME = 'xl_db'
@@ -50,6 +52,16 @@ const _getFunctionRouter = () => {
   })
   expressRouter.get(CHAT_LIST, chatListHandler)
 
+  const renameChatHandler = getHandlerRenameChat({
+    handleRenameChat: handleRenameChat
+  })
+  expressRouter.post(RENAME_CHAT, renameChatHandler)
+
+  const deleteChatHandler = getHandlerDeleteChat({
+    handleDeleteChat: handleDeleteChat
+  })
+  expressRouter.post(DELETE_CHAT, deleteChatHandler)
+
   return expressRouter
 }
 
@@ -64,10 +76,11 @@ const _getErrorRouter = () => {
   return expressRouter
 }
 
+// action
 const getHandlerRegisterPrompt = ({ handleRegisterPrompt }) => {
   return async (req, res) => {
     const { chatId, chatList } = req.body
-    console.log({ debug: true, request: 'ok!', chatList })
+    console.log({ debug: true, request: 'ok!', chatId, chatList })
 
     const handleResult = await handleRegisterPrompt({ chatId, chatList })
 
@@ -97,7 +110,29 @@ const getChatListHandler = ({ handleChatList }) => {
   }
 }
 
+const getHandlerRenameChat = ({ handleRenameChat }) => {
+  return async (req, res) => {
+    const { chatId, oldChatTitle, newChatTitle } = req.body
+    console.log({ debug: true, request: 'ok!', chatId, oldChatTitle, newChatTitle })
 
+    const handleResult = await handleRenameChat({ chatId, oldChatTitle, newChatTitle })
+
+    res.json({ result: handleResult })
+  }
+}
+
+const getHandlerDeleteChat = ({ handleDeleteChat }) => {
+  return async (req, res) => {
+    const { chatId, chatTitle } = req.body
+    console.log({ debug: true, request: 'ok!', chatId, chatTitle })
+
+    const handleResult = await handleDeleteChat({ chatId, chatTitle })
+
+    res.json({ result: handleResult })
+  }
+}
+
+// core
 const handleRegisterPrompt = async ({ chatId, chatList }) => {
   let currentChatId = null
   console.log({ handleRegisterPrompt: true, chatId })
@@ -150,14 +185,31 @@ const registerChat =  async ({ chatId, role, content }) => {
   return rowCount === 1? 'ok': 'ng'
 }
 
+const handleRenameChat =  async ({ chatId, oldChatTitle, newChatTitle }) => {
+  const paramList = [newChatTitle, chatId, oldChatTitle]
+  const query = 'update chat_info.chat_history set chat_title = $1 where chat_id = $2 and chat_title = $3'
+  const { result } = await execQuery({ query, paramList })
+  const { affectedRows } = result
+  return affectedRows === 1? 'ok': 'ng'
+}
+
+const handleDeleteChat =  async ({ chatId, chatTitle }) => {
+  const paramList = [chatId, chatTitle]
+  const query = 'update chat_info.chat_history set is_visible = false where chat_id = $1 and chat_title = $2'
+  const { result } = await execQuery({ query, paramList })
+  const { affectedRows } = result
+  return affectedRows === 1? 'ok': 'ng'
+}
+
+
 const handleChatHistory = async ({ chatIdBefore }) => {
   const paramList = []
   let query = ''
   if (chatIdBefore) {
-    query = 'select chat_id, chat_title from chat_info.chat_history where chat_id <= $1 order by chat_id desc'
+    query = 'select chat_id, chat_title from chat_info.chat_history where chat_id <= $1 and is_visible = true order by chat_id desc'
     paramList.push(chatIdBefore)
   } else {
-    query = 'select chat_id, chat_title from chat_info.chat_history order by chat_id desc'
+    query = 'select chat_id, chat_title from chat_info.chat_history where is_visible = true order by chat_id desc'
   }
   const { result } = await execQuery({ query, paramList })
   const chatHistory = []
