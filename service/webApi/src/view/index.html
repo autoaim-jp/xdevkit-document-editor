@@ -67,7 +67,6 @@
           const response = await fetch(`/api/getChatList?chatId=${chatId}`);
           const data = await response.json();
           this.chatList = data.result;
-	  this.scrollChatListContainer()
 
           const mermaidMatch = data.result[data.result.length - 1].content.match(/```mermaid\n([\s\S]*?)\n```/);
 	  console.log(mermaidMatch)
@@ -80,15 +79,12 @@
         }
       },
       scrollChatListContainer() {
-        setTimeout(() => {
-          this.$refs.chatListContainer.scrollTop = this.$refs.chatListContainer.scrollHeight;
-        }, 1000)
+        $nextTick(() => { this.$refs.chatListContainer.scrollTop = this.$refs.chatListContainer.scrollHeight })
       },
       async sendMessage() {
         if (!this.inputText.trim()) return;
         const newMessage = { role: 'user', content: this.inputText };
         this.chatList.push(newMessage);
-	this.scrollChatListContainer()
 
         const messagesToSend = this.chatList.slice(-6);
         this.inputText = '';
@@ -103,7 +99,6 @@
           const data = await response.json();
           const botReply = { role: 'assistant', content: data.result };
           this.chatList.push(botReply);
-	  this.scrollChatListContainer()
 	  console.log(JSON.stringify(this.chatList))
 
           const mermaidMatch = data.result.match(/```mermaid\n([\s\S]*?)\n```/);
@@ -141,8 +136,8 @@
         <!-- Main Content -->
         <div class="flex h-full">
             <!-- Chat UI -->
-	    <div x-ref="chatListContainer" class="w-1/2 h-screen p-4 bg-white border-r flex flex-col">
-                <div class="flex-grow overflow-y-auto">
+	    <div class="w-1/2 h-screen p-4 bg-white border-r flex flex-col">
+		    <div class="flex-grow overflow-y-auto" x-ref="chatListContainer" x-init="$watch('chatList', () => { console.log('updated chatList'); scrollChatListContainer() })">
                     <div class="flex flex-col gap-4">
                         <template x-for="(message, index) in chatList" :key="index">
                             <div :class="message.role === 'user' ? 'text-right' : 'text-left'">
