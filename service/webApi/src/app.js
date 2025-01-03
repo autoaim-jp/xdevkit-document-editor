@@ -8,6 +8,7 @@ import path from 'path'
 const PUBLIC_STATIC_DIR = 'view'
 const REGISTER_PROMPT = '/api/postMessage'
 const CHAT_HISTORY = '/api/getChatHistory'
+const CHAT_LIST = '/api/getChatList'
 const mod = {}
 
 const _getDefaultRouter = () => {
@@ -36,6 +37,11 @@ const _getFunctionRouter = () => {
     handleChatHistory: handleChatHistory
   })
   expressRouter.get(CHAT_HISTORY, chatHistoryHandler)
+
+  const chatListHandler = getChatListHandler({
+    handleChatList: handleChatList
+  })
+  expressRouter.get(CHAT_LIST, chatListHandler)
 
   return expressRouter
 }
@@ -73,6 +79,17 @@ const getChatHistoryHandler = ({ handleChatHistory }) => {
   }
 }
 
+const getChatListHandler = ({ handleChatList }) => {
+  return async (req, res) => {
+    const { chatId } = req.query
+    console.log({ debug: true, request: 'ok!', chatId })
+
+    const handleResult = await handleChatList({ chatId })
+
+    res.json({ result: handleResult })
+  }
+}
+
 
 const handleRegisterPrompt = async ({ chatList }) => {
   const stream = await mod.openaiClient.chat.completions.create({
@@ -93,6 +110,10 @@ const handleRegisterPrompt = async ({ chatList }) => {
 
 const handleChatHistory = async ({ chatIdBefore }) => {
   return [{ chatId: 'abc', chatTitle: 'title abc', }, { chatId: 'xyz', chatTitle: 'title xyz', }]
+}
+
+const handleChatList = async ({ chatId }) => {
+  return [{"role":"user","content":"適当なmindmapをmermaidで出力して。投資に関するもの。"},{"role":"assistant","content":"もちろん、投資に関するマインドマップの例をMermaidで作成できます。以下に示します。\n\n```mermaid\nmindmap\n  root((投資))\n    資産クラス\n      株式\n        個別株\n        ETF\n        投資信託\n      債券\n        国債\n        社債\n      不動産\n        不動産投資信託(REIT)\n        不動産クラウドファンディング\n      商品\n        金\n        原油\n    投資スタイル\n      短期\n      中長期\n      デイトレード\n    リスク管理\n      分散投資\n      損切り\n      ヘッジ\n    分析手法\n      ファンダメンタルズ分析\n        株価収益率(PER)\n        株価純資産倍率(PBR)\n      テクニカル分析\n        移動平均線\n        RSI\n      マクロ経済分析\n        業種サイクル\n        経済指標\n    株式市場\n      国内市場\n      海外市場\n```\n\nこのマインドマップは、投資に関連する基本的な要素を示していますが、具体的な投資戦略や個別のニーズに応じて詳細を追加することもできます。"}]
 }
 
 const startServer = ({ app, port }) => {
