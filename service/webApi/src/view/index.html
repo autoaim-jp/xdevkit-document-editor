@@ -132,6 +132,10 @@
           console.error('Error fetching chat list:', error);
         }
       },
+      addProject() {
+        alert('プロジェクト追加ボタンがクリックされました。');
+      },
+      
       scrollChatListContainer() {
         $nextTick(() => { this.$refs.chatListContainer.scrollTop = this.$refs.chatListContainer.scrollHeight })
       },
@@ -220,7 +224,16 @@
 
         <!-- Side Menu -->
         <div x-show="menuOpen" class="absolute inset-y-0 left-0 w-80 bg-gray-200 p-4 border-r overflow-y-auto" @click.away="menuOpen = false" x-init="fetchHistoryList">
-            <h2 class="text-lg font-bold mb-4">履歴</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold">プロジェクト</h2>
+                <button @click="addProject()" class="text-green-500 hover:text-green-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6" viewBox="0 0 24 24">
+                        <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <h2 class="text-lg font-bold">履歴</h2>
+ 
             <ul>
                 <template x-for="(item, index) in chatHistoryList" :key="index">
                     <li class="mb-2 flex justify-between items-center">
