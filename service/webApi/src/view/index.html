@@ -45,6 +45,13 @@
       isMobileMode: false,
       popupIndex: null,
       renameInput: '',
+      notificationMessage: '',  // Add this property for the message text
+      showNotification: false,  // Add this property to control visibility
+      showMessage(message) {  // Add this method to show the message
+        this.notificationMessage = message;
+        this.showNotification = true;
+        setTimeout(() => this.showNotification = false, 5 * 1000);  // Hide after 5 seconds
+      },
       togglePopup(index) {
         this.popupIndex = this.popupIndex === index ? null : index;
       },
@@ -96,6 +103,7 @@
         window.addEventListener('load', async () => {
           window.initializeMermaid();
           this.updateDiagram();
+          this.showMessage('ロードが完了しました。');  // Add this line to show the message
         });
       },
       async fetchHistoryList() {
@@ -175,6 +183,12 @@
         }
       }
     }" x-init='init()'>
+    <!-- Notification Message -->
+    <div x-show="showNotification"
+         class="fixed top-4 right-4 bg-blue-500 text-white py-2 px-4 rounded transition-opacity duration-500 z-50" 
+         x-transition>
+      <p x-text="notificationMessage"></p>
+    </div>
 
     <div class="relative h-screen">
       <div class="absolute bottom-20 left-2 flex flex-col space-y-2">
