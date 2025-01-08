@@ -34,6 +34,7 @@ const _getDefaultRouter = () => {
   return expressRouter
 }
 
+const ADD_PROJECT = '/api/addProject'
 const _getFunctionRouter = () => {
   const expressRouter = express.Router()
 
@@ -67,6 +68,11 @@ const _getFunctionRouter = () => {
     handleProjectItemList: handleProjectItemList
   })
   expressRouter.get(PROJECT_LIST, projectItemListHandler)
+  const addProjectHandler = getHandlerAddProject({
+    handleAddProject: handleAddProject
+  })
+  expressRouter.post(ADD_PROJECT, addProjectHandler)
+
 
   return expressRouter
 }
@@ -82,7 +88,26 @@ const _getErrorRouter = () => {
   return expressRouter
 }
 
+const handleAddProject = async ({ projectId, projectTitle }) => {
+  const paramList = [projectId, projectTitle]
+  const query = 'INSERT INTO chat_info.project_list (project_id, project_title) VALUES ($1, $2)'
+  const { result } = await execQuery({ query, paramList })
+  const { rowCount } = result
+  return rowCount === 1 ? 'ok' : 'ng'
+}
+
 // action
+const getHandlerAddProject = ({ handleAddProject }) => {
+  return async (req, res) => {
+    const { projectId, projectTitle } = req.body
+    console.log({ debug: true, request: 'addProject', projectId, projectTitle })
+
+    const result = await handleAddProject({ projectId, projectTitle })
+
+    res.json({ result })
+  }
+}
+
 const getHandlerRegisterPrompt = ({ handleRegisterPrompt }) => {
   return async (req, res) => {
     const { chatId, chatList } = req.body
