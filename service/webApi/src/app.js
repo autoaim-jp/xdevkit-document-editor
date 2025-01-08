@@ -14,6 +14,7 @@ const CHAT_LIST = '/api/getChatList'
 const RENAME_CHAT = '/api/postRename'
 const DELETE_CHAT = '/api/postDelete'
 const PROJECT_LIST = '/api/getProjectItemList'
+const REGISTER_CHAT_IN_PROJECT = '/api/registerChatInProject'
 const DB_HOST = 'mermaid-chatgpt-editor-postgresql'
 const DB_PORT = 5432
 const DB_NAME = 'xl_db'
@@ -68,13 +69,38 @@ const _getFunctionRouter = () => {
     handleProjectItemList: handleProjectItemList
   })
   expressRouter.get(PROJECT_LIST, projectItemListHandler)
+
   const addProjectHandler = getHandlerAddProject({
     handleAddProject: handleAddProject
   })
   expressRouter.post(ADD_PROJECT, addProjectHandler)
 
+  const registerChatInProjectHandler = getHandlerRegisterChatInProject({
+    handleRegisterChatInProject: handleRegisterChatInProject
+  })
+  expressRouter.post(REGISTER_CHAT_IN_PROJECT, registerChatInProjectHandler)
 
   return expressRouter
+}
+
+const getHandlerRegisterChatInProject = ({ handleRegisterChatInProject }) => {
+  return async (req, res) => {
+    const { projectId, chatId } = req.body
+    console.log({ debug: true, request: 'registerChatInProject', projectId, chatId })
+
+    const result = await handleRegisterChatInProject({ projectId, chatId })
+
+    res.json({ result })
+  }
+}
+
+// チャットIDにプロジェクトを登録・更新する関数を実装
+const handleRegisterChatInProject = async ({ projectId, chatId }) => {
+  const paramList = [projectId, chatId]
+  const query = 'UPDATE chat_info.chat_list SET project_id = $1 WHERE chat_id = $2'
+  const { result } = await execQuery({ query, paramList })
+  const { rowCount } = result
+  return rowCount === 1 ? 'ok' : 'ng'
 }
 
 const _getErrorRouter = () => {
