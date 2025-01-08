@@ -13,6 +13,7 @@ const CHAT_HISTORY = '/api/getChatHistory'
 const CHAT_LIST = '/api/getChatList'
 const RENAME_CHAT = '/api/postRename'
 const DELETE_CHAT = '/api/postDelete'
+const PROJECT_LIST = '/api/getProjectItemList'
 const DB_HOST = 'mermaid-chatgpt-editor-postgresql'
 const DB_PORT = 5432
 const DB_NAME = 'xl_db'
@@ -61,6 +62,11 @@ const _getFunctionRouter = () => {
     handleDeleteChat: handleDeleteChat
   })
   expressRouter.post(DELETE_CHAT, deleteChatHandler)
+
+  const projectItemListHandler = getHandlerProjectItemList({
+    handleProjectItemList: handleProjectItemList
+  })
+  expressRouter.get(PROJECT_LIST, projectItemListHandler)
 
   return expressRouter
 }
@@ -132,6 +138,30 @@ const getHandlerDeleteChat = ({ handleDeleteChat }) => {
   }
 }
 
+const getHandlerProjectItemList = ({ handleProjectItemList }) => {
+  return async (req, res) => {
+    console.log({ debug: true, request: 'GET Project Item List' })
+
+    const handleResult = await handleProjectItemList()
+
+    res.json({ result: handleResult })
+  }
+}
+const handleProjectItemList = async () => {
+  const query = 'SELECT * FROM chat_info.chat_history h LEFT JOIN chat_info.project_list p ON h.project_id = p.project_id where h.is_visible = true order BY p.project_id DESC;'
+  const { result } = await execQuery({ query })
+  
+  const projectItemList = {}
+  result.rows.forEach((row) => {
+    const { projectId, projectTitle, chatId, chatTitle } = paramSnakeToCamel({ paramList: row })
+    if (!projectItemList[projectId]) {
+      projectItemList[projectId] = { projectTitle, historyList: [] }
+    }
+    projectItemList[projectId].historyList.push({ chatId, chatTitle })
+  })
+
+  return projectItemList
+}
 // core
 const handleRegisterPrompt = async ({ chatId, chatList }) => {
   let currentChatId = null
