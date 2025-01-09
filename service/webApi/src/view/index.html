@@ -49,6 +49,11 @@
       showNotification: false,  // Add this property to control visibility
       projectTitle: '',  // Add projectTitle property
       showModal: false,  // Add showModal property
+      projectItemList: {},  // Add projectItemList to store projects
+      selectedProjectId: '',  // Track selected project ID 
+ 
+
+
       showMessage(message) {
         this.notificationMessage = message;
         this.showNotification = true;
@@ -136,6 +141,9 @@
       },
       addProject() {
         this.showModal = true;  // Open the modal
+      },
+      updateProject() {
+        alert('プロジェクトが更新されました。');
       },
       scrollChatListContainer() {
         $nextTick(() => { this.$refs.chatListContainer.scrollTop = this.$refs.chatListContainer.scrollHeight })
@@ -272,6 +280,16 @@
                                     </form>
                                     <button @click="deleteChat(item.chatId, item.chatTitle)" class="w-full bg-red-600 text-white py-1 rounded-md hover:bg-red-700 mt-2">削除</button>
                                 </div>
+                                <div class="mb-4">
+                                    <label for="projectSelect" class="block text-sm font-medium">プロジェクトを選択</label>
+                                    <select id="projectSelect" x-model="selectedProjectId" class="w-full border p-2">
+                                        <template x-for="(project, id) in projectItemList" :key="id">
+                                            <option :value="id" x-text="project.projectTitle"></option>
+                                        </template>
+                                    </select>
+                                    <button @click="updateProject()" class="mt-2 w-full bg-green-500 text-white py-2 rounded">プロジェクトを更新</button>
+                                </div>
+ 
                             </div>
                         </div>
                     </li>
