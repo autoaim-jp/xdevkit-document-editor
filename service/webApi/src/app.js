@@ -13,8 +13,8 @@ const CHAT_HISTORY = '/api/getChatHistory'
 const CHAT_LIST = '/api/getChatList'
 const RENAME_CHAT = '/api/postRename'
 const DELETE_CHAT = '/api/postDelete'
-const PROJECT_LIST = '/api/getProjectItemList'
-const REGISTER_CHAT_IN_PROJECT = '/api/registerChatInProject'
+const TAG_LIST = '/api/getTagItemList'
+const REGISTER_CHAT_IN_TAG = '/api/registerChatInTag'
 const DB_HOST = 'mermaid-chatgpt-editor-postgresql'
 const DB_PORT = 5432
 const DB_NAME = 'xl_db'
@@ -35,7 +35,7 @@ const _getDefaultRouter = () => {
   return expressRouter
 }
 
-const ADD_PROJECT = '/api/addProject'
+const ADD_TAG = '/api/addTag'
 const _getFunctionRouter = () => {
   const expressRouter = express.Router()
 
@@ -65,42 +65,44 @@ const _getFunctionRouter = () => {
   })
   expressRouter.post(DELETE_CHAT, deleteChatHandler)
 
-  const projectItemListHandler = getHandlerProjectItemList({
-    handleProjectItemList: handleProjectItemList
+  const tagItemListHandler = getHandlerTagItemList({
+    handleTagItemList: handleTagItemList
   })
-  expressRouter.get(PROJECT_LIST, projectItemListHandler)
+  expressRouter.get(TAG_LIST, tagItemListHandler)
 
-  const addProjectHandler = getHandlerAddProject({
-    handleAddProject: handleAddProject
+  const addTagHandler = getHandlerAddTag({
+    handleAddTag: handleAddTag
   })
-  expressRouter.post(ADD_PROJECT, addProjectHandler)
+  expressRouter.post(ADD_TAG, addTagHandler)
 
-  const registerChatInProjectHandler = getHandlerRegisterChatInProject({
-    handleRegisterChatInProject: handleRegisterChatInProject
+  const registerChatInTagHandler = getHandlerRegisterChatInTag({
+    handleRegisterChatInTag: handleRegisterChatInTag
   })
-  expressRouter.post(REGISTER_CHAT_IN_PROJECT, registerChatInProjectHandler)
+  expressRouter.post(REGISTER_CHAT_IN_TAG, registerChatInTagHandler) 
 
   return expressRouter
 }
 
-const getHandlerRegisterChatInProject = ({ handleRegisterChatInProject }) => {
+const getHandlerRegisterChatInTag = ({ handleRegisterChatInTag }) => {
   return async (req, res) => {
-    const { projectId, chatId } = req.body
-    console.log({ debug: true, request: 'registerChatInProject', projectId, chatId })
+    const { tagId, chatId } = req.body
+    console.log({ debug: true, request: 'registerChatInTag', tagId, chatId })
 
-    const result = await handleRegisterChatInProject({ projectId, chatId })
+    const result = await handleRegisterChatInTag({ tagId, chatId })
 
     res.json({ result })
   }
 }
 
-// チャットIDにプロジェクトを登録・更新する関数を実装
-const handleRegisterChatInProject = async ({ projectId, chatId }) => {
-  const paramList = [projectId, chatId]
-  const query = 'UPDATE chat_info.chat_list SET project_id = $1 WHERE chat_id = $2'
+
+
+// チャットIDにタグを登録・更新する関数を実装
+const handleRegisterChatInTag = async ({ tagId, chatId }) => {
+  const paramList = [tagId, chatId]
+  const query = 'UPDATE chat_info.chat_list SET tag_id = $1 WHERE chat_id = $2'
   const { result } = await execQuery({ query, paramList })
   const { rowCount } = result
-  return rowCount === 1 ? 'ok' : 'ng'
+  return rowCount === 1? 'ok': 'ng'
 }
 
 const _getErrorRouter = () => {
@@ -114,21 +116,23 @@ const _getErrorRouter = () => {
   return expressRouter
 }
 
-const handleAddProject = async ({ projectId, projectTitle }) => {
-  const paramList = [projectId, projectTitle]
-  const query = 'INSERT INTO chat_info.project_list (project_id, project_title) VALUES ($1, $2)'
+
+const handleAddTag = async ({ tagId, tagTitle }) => {
+  const paramList = [tagId, tagTitle]
+  const query = 'INSERT INTO chat_info.tag_list (tag_id, tag_title) VALUES ($1, $2)'
   const { result } = await execQuery({ query, paramList })
   const { rowCount } = result
-  return rowCount === 1 ? 'ok' : 'ng'
+  return rowCount === 1? 'ok': 'ng'
 }
 
-// action
-const getHandlerAddProject = ({ handleAddProject }) => {
-  return async (req, res) => {
-    const { projectId, projectTitle } = req.body
-    console.log({ debug: true, request: 'addProject', projectId, projectTitle })
 
-    const result = await handleAddProject({ projectId, projectTitle })
+// action
+const getHandlerAddTag = ({ handleAddTag }) => {
+  return async (req, res) => {
+    const { tagId, tagTitle } = req.body
+    console.log({ debug: true, request: 'addTag', tagId, tagTitle })
+
+    const result = await handleAddTag({ tagId, tagTitle })
 
     res.json({ result })
   }
@@ -189,30 +193,32 @@ const getHandlerDeleteChat = ({ handleDeleteChat }) => {
   }
 }
 
-const getHandlerProjectItemList = ({ handleProjectItemList }) => {
+const getHandlerTagItemList = ({ handleTagItemList }) => {
   return async (req, res) => {
-    console.log({ debug: true, request: 'GET Project Item List' })
+    console.log({ debug: true, request: 'GET Tag Item List' })
 
-    const handleResult = await handleProjectItemList()
+    const handleResult = await handleTagItemList()
 
     res.json({ result: handleResult })
   }
 }
-const handleProjectItemList = async () => {
-  const query = 'SELECT * FROM chat_info.chat_history h LEFT JOIN chat_info.project_list p ON h.project_id = p.project_id where h.is_visible = true order BY p.project_id DESC;'
+
+const handleTagItemList = async () => {
+  const query = 'SELECT * FROM chat_info.chat_history h LEFT JOIN chat_info.tag_list p ON h.tag_id = p.tag_id where h.is_visible = true order BY p.tag_id DESC;'
   const { result } = await execQuery({ query })
   
-  const projectItemList = {}
+  const tagItemList = {}
   result.rows.forEach((row) => {
-    const { projectId, projectTitle, chatId, chatTitle } = paramSnakeToCamel({ paramList: row })
-    if (!projectItemList[projectId]) {
-      projectItemList[projectId] = { projectTitle, historyList: [] }
+    const { tagId, tagTitle, chatId, chatTitle } = paramSnakeToCamel({ paramList: row })
+    if (!tagItemList[tagId]) {
+      tagItemList[tagId] = { tagTitle, historyList: [] }
     }
-    projectItemList[projectId].historyList.push({ chatId, chatTitle })
+    tagItemList[tagId].historyList.push({ chatId, chatTitle })
   })
 
-  return projectItemList
+  return tagItemList
 }
+
 // core
 const handleRegisterPrompt = async ({ chatId, chatList }) => {
   let currentChatId = null
