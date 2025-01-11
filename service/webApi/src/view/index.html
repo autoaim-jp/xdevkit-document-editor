@@ -1,13 +1,13 @@
 <!DOCTYPE HTML>
 <!-- Mermaid rendering with Alpine.js and UI adjustment -->
 <html lang='ja'>
-<head>
-  <meta charset='UTF-8'>
-  <title>Mermaid Render with Alpine.js</title>
-  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-  <script src='https://cdn.tailwindcss.com'></script>
-  <script src='https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js' defer></script>
-  <script type='module'>
+  <head>
+    <meta charset='UTF-8'>
+    <title>Mermaid Render with Alpine.js</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <script src='https://cdn.tailwindcss.com'></script>
+    <script src='https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js' defer></script>
+    <script type='module'>
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 
     window.initializeMermaid = () => {
@@ -23,10 +23,10 @@
         console.error('Error rendering Mermaid diagram:', error);
       }
     };
-  </script>
-  <script src='/index.js'></script>
-</head>
-<body class='bg-gray-100 font-sans' x-data="bodyData()" x-init='init()'>
+    </script>
+    <script src='/index.js'></script>
+  </head>
+  <body class='bg-gray-100 font-sans' x-data="bodyData()" x-init='init()'>
     <!-- Notification Message -->
     <div x-show="showNotification"
          class="fixed top-4 right-4 bg-blue-500 text-white py-2 px-4 rounded transition-opacity duration-500 z-50" 
@@ -35,12 +35,12 @@
     </div>
 
     <!-- Modal -->
-<div x-show="showModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-  <form @submit.prevent="submitTag()" class="bg-white p-8 rounded shadow-md w-1/3" @click.away="showModal = false">
-    <h2 class="text-xl mb-4">タグ作成</h2>
-    <input type="text" x-model="tagTitle" class="border p-2 w-full" placeholder="タグタイトルを入力">
-    <div class="flex justify-end mt-4">
-      <button class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
+    <div x-show="showModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <form @submit.prevent="submitTag()" class="bg-white p-8 rounded shadow-md w-1/3" @click.away="showModal = false">
+        <h2 class="text-xl mb-4">タグ作成</h2>
+        <input type="text" x-model="tagTitle" class="border p-2 w-full" placeholder="タグタイトルを入力">
+        <div class="flex justify-end mt-4">
+          <button class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
         </div>
       </form>
     </div>
@@ -49,120 +49,124 @@
       <div class="absolute bottom-20 left-2 flex flex-col space-y-2">
         <!-- Menu Button -->
         <button @click="menuOpen = !menuOpen" class="bg-gray-300 p-2 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 6.75h16.5m-16.5 6.75h16.5" />
-            </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 6.75h16.5m-16.5 6.75h16.5" />
+          </svg>
         </button>
 
         <!-- UI Toggle Button -->
         <button 
-            @click="switchMobileMode()"
-            class="bg-gray-300 p-2 rounded-full">
-            <template x-if="isMobileMode">
-                <!-- Icon for PC Mode -->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h18v18H3V3z" />
-                </svg>
-            </template>
-            <template x-if="!isMobileMode">
-                <!-- Icon for Mobile Mode -->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3h10.5c.69 0 1.25.56 1.25 1.25v15.5c0 .69-.56 1.25-1.25 1.25H6.75A1.25 1.25 0 015.5 19.75V4.25C5.5 3.56 6.06 3 6.75 3z" />
-                </svg>
-            </template>
+                                                                 @click="switchMobileMode()"
+                                                                 class="bg-gray-300 p-2 rounded-full">
+          <template x-if="isMobileMode">
+            <!-- Icon for PC Mode -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h18v18H3V3z" />
+            </svg>
+          </template>
+          <template x-if="!isMobileMode">
+            <!-- Icon for Mobile Mode -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3h10.5c.69 0 1.25.56 1.25 1.25v15.5c0 .69-.56 1.25-1.25 1.25H6.75A1.25 1.25 0 015.5 19.75V4.25C5.5 3.56 6.06 3 6.75 3z" />
+            </svg>
+          </template>
         </button>
       </div>
 
-        <!-- Side Menu -->
-        <div x-show="menuOpen" class="absolute inset-y-0 left-0 w-80 bg-gray-200 p-4 border-r overflow-y-auto" @click.away="menuOpen = false" x-init="fetchHistoryList">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold">タグ</h2>
-                <button @click="addTag()" class="text-green-500 hover:text-green-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6" viewBox="0 0 24 24">
-                        <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-            </div>
-            <h2 class="text-lg font-bold">履歴</h2>
- 
-            <ul>
-                <template x-for="(item, index) in chatHistoryList" :key="index">
-                    <li class="mb-2 flex justify-between items-center">
-                        <!-- メインボタン -->
-                        <button @click="fetchChatList(item.chatId); menuOpen = false;" class="text-blue-600 hover:underline overflow-y-auto text-left" x-text="item.chatTitle"></button>
-                        <!-- 三点ドットボタン -->
-                        <div class="relative">
-                            <button @click="togglePopup(index)" class="text-gray-500 hover:text-gray-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M10 6a2 2 0 100-4 2 2 0 000 4zM10 12a2 2 0 100-4 2 2 0 000 4zM10 18a2 2 0 100-4 2 2 0 000 4z" />
-                                </svg>
-                            </button>
-                            <!-- ポップアップ -->
-                            <div x-show="popupIndex === index" @click.away="popupIndex = null" class="absolute right-0 mt-2 w-48 bg-white shadow-md border rounded-md z-10">
-                                <div class="p-4">
-                                    <form @submit.prevent="renameChat(item.chatId, item.chatTitle)">
-                                        <input type="text" x-model="renameInput" class="w-full border-gray-300 rounded-md p-2 mb-2" placeholder="名前を変更">
-                                        <button type="submit" class="w-full bg-blue-600 text-white py-1 rounded-md hover:bg-blue-700">変更</button>
-                                    </form>
-                                    <button @click="deleteChat(item.chatId, item.chatTitle)" class="w-full bg-red-600 text-white py-1 rounded-md hover:bg-red-700 mt-2">削除</button>
-                                </div>
-                                <div class="p-4">
-                                    <label for="tagSelect" class="block text-sm font-medium">タグを選択</label>
-                                    <select id="tagSelect" x-model="selectedTagId" class="w-full border p-2">
-                                        <template x-for="(tag, id) in tagItemList" :key="id">
-                                            <option :value="id" x-text="tag.tagTitle"></option>
-                                        </template>
-                                    </select>
-                                    <button @click="updateTag()" class="mt-2 w-full bg-green-500 text-white py-2 rounded">タグを更新</button>
-                                </div>
- 
-                            </div>
-                        </div>
-                    </li>
-                </template>
-            </ul>
+      <!-- Side Menu -->
+      <div x-show="menuOpen" class="absolute inset-y-0 left-0 w-80 bg-gray-200 p-4 border-r overflow-y-auto" @click.away="menuOpen = false" x-init="fetchHistoryList">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-bold">タグ</h2>
+          <button @click="addTag()" class="text-green-500 hover:text-green-700">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6" viewBox="0 0 24 24">
+              <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         </div>
+        <h2 class="text-lg font-bold">履歴</h2>
 
-        <!-- Main Content -->
-        <div class="flex h-full">
-            <!-- Chat UI -->
-	      <div x-ref="chatUiContainer" class="w-1/2 h-screen p-4 bg-white border-r flex flex-col">
-		    <div class="flex-grow overflow-y-auto" x-ref="chatListContainer" x-init="$watch('chatList', () => { scrollChatListContainer() })">
-        <div class="flex flex-col gap-4">
-            <template x-for="(message, index) in chatList" :key="index">
+        <ul>
+          <template x-for="(item, index) in chatHistoryList" :key="index">
+            <li class="mb-2 flex justify-between items-center">
+              <!-- メインボタン -->
+              <button @click="fetchChatList(item.chatId); menuOpen = false;" class="text-blue-600 hover:underline overflow-y-auto text-left" x-text="item.chatTitle"></button>
+              <!-- 三点ドットボタン -->
+              <div class="relative">
+                <button @click="togglePopup(index)" class="text-gray-500 hover:text-gray-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 6a2 2 0 100-4 2 2 0 000 4zM10 12a2 2 0 100-4 2 2 0 000 4zM10 18a2 2 0 100-4 2 2 0 000 4z" />
+                  </svg>
+                </button>
+                <!-- ポップアップ -->
+                <div x-show="popupIndex === index" @click.away="popupIndex = null" class="absolute right-0 mt-2 w-48 bg-white shadow-md border rounded-md z-10">
+                  <div class="p-4">
+                    <form @submit.prevent="renameChat(item.chatId, item.chatTitle)">
+                      <input type="text" x-model="renameInput" class="w-full border-gray-300 rounded-md p-2 mb-2" placeholder="名前を変更">
+                      <button type="submit" class="w-full bg-blue-600 text-white py-1 rounded-md hover:bg-blue-700">変更</button>
+                    </form>
+                    <button @click="deleteChat(item.chatId, item.chatTitle)" class="w-full bg-red-600 text-white py-1 rounded-md hover:bg-red-700 mt-2">削除</button>
+                  </div>
+                  <div class="p-4">
+                    <label for="tagSelect" class="block text-sm font-medium">タグを選択</label>
+                    <select id="tagSelect" x-model="selectedTagId" class="w-full border p-2">
+                      <template x-for="(tag, id) in tagItemList" :key="id">
+                        <option :value="id" x-text="tag.tagTitle"></option>
+                      </template>
+                    </select>
+                    <button @click="updateTag()" class="mt-2 w-full bg-green-500 text-white py-2 rounded">タグを更新</button>
+                  </div>
+
+                </div>
+              </div>
+            </li>
+          </template>
+        </ul>
+      </div>
+
+      <!-- Main Content -->
+      <div class="flex h-full">
+        <!-- Chat UI -->
+        <div x-ref="chatUiContainer" class="w-1/2 h-screen p-4 bg-white border-r flex flex-col">
+          <div class="flex-grow overflow-y-auto" x-ref="chatListContainer" x-init="$watch('chatList', () => { scrollChatListContainer() })">
+            <div class="flex flex-col gap-4">
+              <template x-for="(message, index) in chatList" :key="index">
                 <!-- 外側のdivにflexと条件でjustify-end or justify-startを適用 -->
                 <div :class="message.role === 'user' ? 'flex justify-end' : 'flex justify-start'">
-                    <!-- メッセージバブル -->
-                    <div :class="message.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'" 
-                         class="inline-block p-2 rounded-lg max-w-[70%]">
-                        <pre class="whitespace-pre-wrap" x-text="message.content"></pre>
-                    </div>
+                  <!-- メッセージバブル -->
+                  <div :class="message.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'" 
+                        class="inline-block p-2 rounded-lg max-w-[70%]">
+                    <pre class="whitespace-pre-wrap" x-text="message.content"></pre>
+                  </div>
                 </div>
-            </template>
-        </div>
-
-                </div>
-
-                <div class="mt-4 flex">
-                    <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage"
-                        class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
-                    <button @click="sendMessage"
-                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Send</button>
-                </div>
+              </template>
             </div>
 
-            <!-- Mermaid Display -->
-            <div x-ref="mermaidUiContainer" class="w-1/2 h-screen overflow-y-auto">
-                <div id="svgContainer" class="bg-gray-50 border p-4 rounded-lg flex justify-center"></div>
-                <div x-ref="miniDisplayForm" class="mt-4 flex hidden">
-                    <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage"
-                        class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
-                    <button @click="sendMessage"
-                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Send</button>
-                </div>
-            </div>
+          </div>
+
+          <div class="mt-4 flex">
+            <select x-model="selectedOption" class="border rounded p-2 mr-2">
+              <option value="4o">4o</option>
+              <option value="o1">o1</option>
+            </select>
+          <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage" class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
+          <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Send</button>
         </div>
+      </div>
+
+      <!-- Mermaid Display -->
+      <div x-ref="mermaidUiContainer" class="w-1/2 h-screen overflow-y-auto">
+        <div id="svgContainer" class="bg-gray-50 border p-4 rounded-lg flex justify-center"></div>
+        <div x-ref="miniDisplayForm" class="mt-4 flex hidden">
+          <select x-model="selectedOption" class="border rounded p-2 mr-2">
+            <option value="4o">4o</option>
+            <option value="o1">o1</option>
+          </select>
+          <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage" class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
+          <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Send</button>
+        </div>
+      </div>
     </div>
-</body>
+    </div>
+  </body>
 </html>
 

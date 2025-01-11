@@ -12,6 +12,7 @@ function bodyData() {
            Bob-->>John: Jolly good!`,
     timeout: null,
     inputText: '',
+    selectedOption: '4o',
     chatId: null,
     chatList: [],
     chatHistoryList: [],
@@ -137,7 +138,11 @@ function bodyData() {
         const response = await fetch('/api/postMessage', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chatId: this.chatId, chatList: messagesToSend }),
+          body: JSON.stringify({
+            chatId: this.chatId,
+            chatList: messagesToSend,
+            selectedOption: this.selectedOption // Add selectedOption to the request body
+          }),
         });
 
         const data = await response.json();
