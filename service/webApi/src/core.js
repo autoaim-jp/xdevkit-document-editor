@@ -2,9 +2,11 @@ export default {}
 
 const mod = {}
 
-export const init = ({ openaiClient }) => {
+export const init = ({ openaiClient, pgPool, ulid }) => {
   Object.assign(mod, {
     openaiClient,
+    pgPool,
+    ulid,
   })
 }
 
@@ -41,26 +43,26 @@ export const handleTagItemList = async () => {
   return tagItemList
 }
 
-// core
-export const handleRegisterPrompt = async ({ chatId, chatList }) => {
+export const handleRegisterPrompt = async ({ chatId, chatList, selectedModel }) => {
   let currentChatId = null
   console.log({ handleRegisterPrompt: true, chatId })
   if (chatId) {
     currentChatId = chatId
   } else {
-    currentChatId = ulid()
+    currentChatId = mod.ulid()
     await registerChatId({ chatId: currentChatId })
   }
 
   const prompt = chatList[chatList.length - 1].content
   await registerChat({ chatId: currentChatId, role: 'user', content: prompt })
 
+  const model = selectedModel === 'o1' ? 'o1-preview' : 'gpt-4o'
+  console.log({ handleRegisterPrompt: true, chatId, model })
   const stream = await mod.openaiClient.chat.completions.create({
-    model: 'gpt-4o',
-    // model: 'gpt-3.5-turbo',
+    model,
     messages: chatList,
     stream: true,
-    max_tokens: 8192,
+    // max_tokens: 8192,
   })
   let responseMessage = ''
   for await (const part of stream) {
@@ -177,6 +179,21 @@ const formatDate = ({ format, date }) => {
     .replace(/hh/g, (`0${date.getHours()}`).slice(-2))
     .replace(/mm/g, (`0${date.getMinutes()}`).slice(-2))
     .replace(/ss/g, (`0${date.getSeconds()}`).slice(-2))
+}
+
+const paramSnakeToCamel = ({ paramList }) => {
+  if (paramList === undefined) {
+    paramList = {}
+  }
+
+  const newParamList = {}
+  Object.entries(paramList).forEach(([key, value]) => {
+    const newKey = key.replace(/([_][a-z])/g, (group) => {
+      return group.toUpperCase().replace('_', '')
+    })
+    newParamList[newKey] = value
+  })
+  return newParamList
 }
 
 

@@ -12,7 +12,7 @@ function bodyData() {
            Bob-->>John: Jolly good!`,
     timeout: null,
     inputText: '',
-    selectedOption: '4o',
+    selectedModel: '4o',
     chatId: null,
     chatList: [],
     chatHistoryList: [],
@@ -141,7 +141,7 @@ function bodyData() {
           body: JSON.stringify({
             chatId: this.chatId,
             chatList: messagesToSend,
-            selectedOption: this.selectedOption // Add selectedOption to the request body
+            selectedModel: this.selectedModel
           }),
         });
 

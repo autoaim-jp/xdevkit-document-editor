@@ -135,6 +135,8 @@ const init = async () => {
 
   const pgPool = createPgPool({ pg })
   mod.pgPool = pgPool
+
+  a.core.init({ openaiClient, pgPool, ulid })
 }
 
 const main = async () => {

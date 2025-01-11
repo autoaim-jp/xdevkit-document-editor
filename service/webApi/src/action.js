@@ -24,10 +24,10 @@ export const getHandlerAddTag = ({ handleAddTag }) => {
 
 export const getHandlerRegisterPrompt = ({ handleRegisterPrompt }) => {
   return async (req, res) => {
-    const { chatId, chatList } = req.body
-    console.log({ debug: true, request: 'ok!', chatId, chatList })
+    const { chatId, chatList, selectedModel } = req.body
+    console.log({ debug: true, request: 'ok!', chatId, chatList, selectedModel })
 
-    const handleResult = await handleRegisterPrompt({ chatId, chatList })
+    const handleResult = await handleRegisterPrompt({ chatId, chatList, selectedModel })
 
     res.json({ result: handleResult })
   }
@@ -85,21 +85,6 @@ export const getHandlerTagItemList = ({ handleTagItemList }) => {
 
     res.json({ result: handleResult })
   }
-}
-
-const paramSnakeToCamel = ({ paramList }) => {
-  if (paramList === undefined) {
-    paramList = {}
-  }
-
-  const newParamList = {}
-  Object.entries(paramList).forEach(([key, value]) => {
-    const newKey = key.replace(/([_][a-z])/g, (group) => {
-      return group.toUpperCase().replace('_', '')
-    })
-    newParamList[newKey] = value
-  })
-  return newParamList
 }
 
 
