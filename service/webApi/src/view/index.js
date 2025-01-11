@@ -27,6 +27,7 @@ function bodyData() {
     tagTitle: '',  // Add tagTitle property
     showModal: false,  // Add showModal property
     tagItemList: {},  // Add tagItemList to store tags
+    tagList: {},  // Add tagItemList to store tags
     selectedTagId: '',  // Track selected tag ID
     viewInfo: '',
 
@@ -97,7 +98,8 @@ function bodyData() {
       window.addEventListener('load', async () => {
         window.initializeMermaid();
         this.updateDiagram();
-        await this.fetchTagItemList();  // Fetch tag item list on initialization
+        await this.fetchTagItemList();
+        await this.fetchTagList(); // Fetch tag list on initialization
       });
     },
     async fetchTagItemList() {
@@ -107,6 +109,15 @@ function bodyData() {
         this.tagItemList = data.result;
       } catch (error) {
         console.error('Error fetching tag item list:', error);
+      }
+    },
+    async fetchTagList() {
+      try {
+        const response = await fetch('/api/getTagList');
+        const data = await response.json();
+        this.tagList = data.result;
+      } catch (error) {
+        console.error('Error fetching tag list:', error);
       }
     },
     async fetchHistoryList() {

@@ -119,8 +119,8 @@
                   <div class="p-4">
                     <label for="tagSelect" class="block text-sm font-medium">タグを選択</label>
                     <select id="tagSelect" x-model="selectedTagId" class="w-full border p-2">
-                      <template x-for="(tag, id) in tagItemList" :key="id">
-                        <option :value="id" x-text="tag.tagTitle"></option>
+                      <template x-for="(tag, tagId) in tagList" :key="tagId">
+                        <option :value="tagId" x-text="tag.tagTitle"></option>
                       </template>
                     </select>
                     <button @click="updateTag()" class="mt-2 w-full bg-green-500 text-white py-2 rounded">タグを更新</button>

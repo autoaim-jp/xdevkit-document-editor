@@ -27,10 +27,21 @@ export const handleRegisterTag = async ({ tagTitle }) => {
   return rowCount === 1? 'ok': 'ng'
 }
 
+export const handleTagList = async () => {
+  const query = 'SELECT tag_id, tag_title FROM chat_info.tag_list WHERE is_visible = true ORDER BY tag_id DESC'
+  const { result } = await execQuery({ query })
+  const tagList = {}
+  result.rows.forEach((row) => {
+    const { tagId, tagTitle } = paramSnakeToCamel({ paramList: row })
+    tagList[tagId] = { tagTitle }
+  })
+  return tagList
+}
+
 export const handleTagItemList = async () => {
   const query = 'SELECT tcl.tag_id, tcl.chat_id, tl.tag_title, ch.chat_title FROM chat_info.tag_chat_list tcl LEFT JOIN chat_info.tag_list tl ON tcl.tag_id = tl.tag_id left join chat_info.chat_history ch on tcl.chat_id = ch.chat_id where tl.is_visible = true and ch.is_visible = true order BY tcl.date_registered DESC;'
   const { result } = await execQuery({ query })
-  
+
   const tagItemList = {}
   result.rows.forEach((row) => {
     const { tagId, tagTitle, chatId, chatTitle } = paramSnakeToCamel({ paramList: row })

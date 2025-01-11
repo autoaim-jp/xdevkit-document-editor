@@ -77,6 +77,16 @@ export const getHandlerDeleteChat = ({ handleDeleteChat }) => {
   }
 }
 
+export const getHandlerTagList = ({ handleTagList }) => {
+  return async (req, res) => {
+    console.log({ debug: true, request: 'GET Tag List' })
+
+    const handleResult = await handleTagList()
+
+    res.json({ result: handleResult })
+  }
+}
+
 export const getHandlerTagItemList = ({ handleTagItemList }) => {
   return async (req, res) => {
     console.log({ debug: true, request: 'GET Tag Item List' })
