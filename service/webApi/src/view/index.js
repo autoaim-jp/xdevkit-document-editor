@@ -17,6 +17,7 @@ function bodyData() {
     chatTitle: 'New Chat',
     chatList: [],
     chatHistoryList: [],
+    selectedContentIndex: -1,
     menuOpen: false,
     isMobileMode: false,
     popupIndex: null,
@@ -27,6 +28,7 @@ function bodyData() {
     showModal: false,  // Add showModal property
     tagItemList: {},  // Add tagItemList to store tags
     selectedTagId: '',  // Track selected tag ID 
+    viewInfo: '',
 
     showMessage(message) {
       this.notificationMessage = message;
@@ -96,6 +98,25 @@ function bodyData() {
         console.error('Error fetching history list:', error);
       }
     },
+    async loadCodeBlock(index) {
+      if (this.selectedContentIndex === index) {
+        return
+      }
+      this.selectedContentIndex = index
+      const { role, content } = this.chatList[index]
+      if (index !== (this.chatList.length -1)) {
+        const indexDiff = Math.floor(((this.chatList.length -1) - index) / 2)
+        this.viewInfo = `${indexDiff}世代前の${role}`
+      } else {
+        this.viewInfo = ''
+      }
+      const mermaidMatch = content.match(/```mermaid\n([\s\S]*?)\n```/);
+      console.log(mermaidMatch)
+      if (mermaidMatch) {
+        this.diagram = mermaidMatch[1];
+        this.updateDiagram();
+      }
+    },
     async fetchChatList(chatId, chatTitle) {
       this.chatId = chatId
       this.chatTitle = chatTitle
@@ -104,13 +125,9 @@ function bodyData() {
         const response = await fetch(`/api/getChatList?chatId=${chatId}`);
         const data = await response.json();
         this.chatList = data.result;
+        this.selectedContentIndex = -1
 
-        const mermaidMatch = data.result[data.result.length - 1].content.match(/```mermaid\n([\s\S]*?)\n```/);
-        console.log(mermaidMatch)
-        if (mermaidMatch) {
-          this.diagram = mermaidMatch[1];
-          this.updateDiagram();
-        }
+        this.loadCodeBlock(this.chatList.length - 1)
       } catch (error) {
         console.error('Error fetching chat list:', error);
       }
