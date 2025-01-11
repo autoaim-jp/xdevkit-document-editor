@@ -22,6 +22,7 @@ function bodyData() {
     isMobileMode: false,
     popupIndex: null,
     renameInput: '',
+    tagRenameInput: '',
     notificationMessage: '',  // Add this property for the message text
     showNotification: false,  // Add this property to control visibility
     tagTitle: '',  // Add tagTitle property
@@ -39,6 +40,7 @@ function bodyData() {
     togglePopup(index) {
       this.popupIndex = this.popupIndex === index ? null : index
     },
+
     async renameChat(chatId, chatTitle) {
       this.popupIndex = null // ポップアップを閉じる
       if (!this.renameInput.trim()) return
@@ -52,7 +54,8 @@ function bodyData() {
           body: JSON.stringify({ chatId, oldChatTitle: chatTitle, newChatTitle }),
         })
         this.fetchHistoryList()
-        this.showMessage(`成功: リネーム ${chatTitle} -> ${newChatTitle}`)
+        this.fetchTagItemList()
+        this.showMessage(`成功: チャットリネーム ${chatTitle} -> ${newChatTitle}`)
       } catch (error) {
         console.error('Error:', error)
         alert(error.message)
@@ -72,6 +75,7 @@ function bodyData() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ chatId, chatTitle }),
         })
+        this.fetchTagItemList()
         await this.fetchHistoryList()
         this.showMessage(`成功: チャット削除 ${chatTitle}`)
 
@@ -87,6 +91,14 @@ function bodyData() {
         alert(error.message)
       }
     },
+
+    async renameTag(tagId, tagTitle) {
+      this.showMessage(`成功: タグリネーム ${tagTitle} -> ${"------------------------"}`)
+    },
+    async deleteTag(tagId, tagTitle) {
+      this.showMessage(`成功: タグ削除 ${tagTitle}`)
+    },
+
     updateDiagram() {
       clearTimeout(this.timeout)
       this.timeout = setTimeout(() => {
@@ -118,6 +130,13 @@ function bodyData() {
         const response = await fetch('/api/getTagList')
         const data = await response.json()
         this.tagList = data.result
+
+        // selectのデフォルト値を設定
+        if (Object.keys(this.tagList).length === 0) {
+          return
+        }
+        this.selectedTagId = Object.keys(this.tagList)[0]
+
       } catch (error) {
         console.error('Error fetching tag list:', error)
       }
