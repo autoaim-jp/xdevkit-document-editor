@@ -10,7 +10,7 @@ export const init = ({ openaiClient, pgPool, ulid }) => {
   })
 }
 
-export const handleRegisterChatInTag = async ({ tagId, chatId }) => {
+export const handleTagChat = async ({ tagId, chatId }) => {
   const paramList = [tagId, chatId]
   const query = 'insert into chat_info.tag_chat_list (tag_id, chat_id) values ($1, $2)'
   const { result } = await execQuery({ query, paramList })
@@ -18,7 +18,7 @@ export const handleRegisterChatInTag = async ({ tagId, chatId }) => {
   return rowCount === 1? 'ok': 'ng'
 }
 
-export const handleAddTag = async ({ tagId, tagTitle }) => {
+export const handleRegisterTag = async ({ tagId, tagTitle }) => {
   const paramList = [tagId, tagTitle]
   const query = 'insert into chat_info.tag_list (tag_id, tag_title) values ($1, $2)'
   const { result } = await execQuery({ query, paramList })

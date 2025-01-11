@@ -23,8 +23,8 @@ const CHAT_LIST = '/api/getChatList'
 const RENAME_CHAT = '/api/postRename'
 const DELETE_CHAT = '/api/postDelete'
 const TAG_LIST = '/api/getTagItemList'
-const REGISTER_CHAT_IN_TAG = '/api/registerChatInTag'
-const ADD_TAG = '/api/addTag'
+const TAG_CHAT = '/api/tagChat'
+const REGISTER_TAG = '/api/registerTag'
 const DB_HOST = 'mermaid-chatgpt-editor-postgresql'
 const DB_PORT = 5432
 const DB_NAME = 'xl_db'
@@ -78,15 +78,15 @@ const _getFunctionRouter = () => {
   })
   expressRouter.get(TAG_LIST, tagItemListHandler)
 
-  const addTagHandler = a.action.getHandlerAddTag({
-    handleAddTag: a.core.handleAddTag
+  const registerTagHandler = a.action.getHandlerRegisterTag({ 
+    handleRegisterTag: a.core.handleRegisterTag 
   })
-  expressRouter.post(ADD_TAG, addTagHandler)
+  expressRouter.post(REGISTER_TAG, registerTagHandler) 
 
-  const registerChatInTagHandler = a.action.getHandlerRegisterChatInTag({
-    handleRegisterChatInTag: a.core.handleRegisterChatInTag
+  const tagChatHandler = a.action.getHandlerTagChat({ 
+    handleTagChat: a.core.handleTagChat 
   })
-  expressRouter.post(REGISTER_CHAT_IN_TAG, registerChatInTagHandler) 
+  expressRouter.post(TAG_CHAT, tagChatHandler) 
 
   return expressRouter
 }

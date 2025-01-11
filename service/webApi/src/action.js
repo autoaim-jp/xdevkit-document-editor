@@ -1,6 +1,6 @@
 export default {}
 
-export const getHandlerRegisterChatInTag = ({ handleRegisterChatInTag }) => {
+export const getHandlerTagChat = ({ handleTagChat }) => {
   return async (req, res) => {
     const { tagId, chatId } = req.body
     console.log({ debug: true, request: 'registerChatInTag', tagId, chatId })
@@ -11,7 +11,7 @@ export const getHandlerRegisterChatInTag = ({ handleRegisterChatInTag }) => {
   }
 }
 
-export const getHandlerAddTag = ({ handleAddTag }) => {
+export const getHandlerRegisterTag = ({ handleRegisterTag }) => {
   return async (req, res) => {
     const { tagId, tagTitle } = req.body
     console.log({ debug: true, request: 'addTag', tagId, tagTitle })
