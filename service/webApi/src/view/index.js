@@ -51,6 +51,7 @@ function bodyData() {
           body: JSON.stringify({ chatId, oldChatTitle: chatTitle, newChatTitle }),
         });
         this.fetchHistoryList()
+        this.showMessage(`成功: リネーム ${chatTitle} -> ${newChatTitle}`);
       } catch (error) {
         console.error('Error:', error);
         alert(error.message);
@@ -70,7 +71,16 @@ function bodyData() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ chatId, chatTitle }),
         });
-        this.fetchHistoryList()
+        await this.fetchHistoryList()
+        this.showMessage(`成功: チャット削除 ${chatTitle}`);
+
+        if(this.chatHistoryList.length === 0) {
+          return
+        }
+
+        // 最新のチャットを表示
+        const { chatId: latestChatId, chatTitle: latestChatTitle } = this.chatHistoryList[0]
+        await this.fetchChatList(latestChatId, latestChatTitle)
       } catch (error) {
         console.error('Error:', error);
         alert(error.message);
@@ -80,13 +90,13 @@ function bodyData() {
       clearTimeout(this.timeout);
       this.timeout = setTimeout(() => {
         renderMermaidDiagram(this.diagram, 'svgContainer');
+        this.showMessage('成功: ロードが完了');
       }, 1000);
     },
     init() {
       window.addEventListener('load', async () => {
         window.initializeMermaid();
         this.updateDiagram();
-        this.showMessage('ロードが完了しました。');  // Add this line to show the message
       });
     },
     async fetchHistoryList() {
@@ -130,7 +140,7 @@ function bodyData() {
 
         return true
       } else {
-        this.showMessage('mermaidコードブロックが見つかりません');
+        this.showMessage('失敗: mermaidコードブロックが見つかりません');
       }
 
       return false
@@ -147,7 +157,7 @@ function bodyData() {
 
       try {
         await navigator.clipboard.writeText(this.diagram);
-        this.showMessage('クリップボードにコピーしました');
+        this.showMessage('成功: クリップボードにコピー');
       } catch (err) {
         console.error('Error copying to clipboard:', err);
         this.showMessage('失敗: クリップボードコピーできません');
@@ -166,6 +176,8 @@ function bodyData() {
         const data = await response.json();
         this.resetChatList(data.result)
         this.loadCodeBlock(this.chatList.length - 1)
+         
+        this.showMessage('成功: チャット読み込み');
       } catch (error) {
         console.error('Error fetching chat list:', error);
       }
@@ -174,13 +186,13 @@ function bodyData() {
       this.showModal = true;  // Open the modal
     },
     updateTag() {
-      alert('タグが更新されました。');
+      this.showMessage('成功: タグ更新');
     },
     scrollChatListContainer() {
       Alpine.nextTick(() => { this.$refs.chatListContainer.scrollTop = this.$refs.chatListContainer.scrollHeight })
     },
     submitTag() {
-      alert(`新しいタグ名: ${this.tagTitle}`);
+      this.showMessage(`成功: タグ作成 ${this.tagTitle}`);
       this.tagTitle = ''; // Clear the input after submission
       this.showModal = false; // Close the modal
     },
@@ -191,6 +203,7 @@ function bodyData() {
 
       const messagesToSend = this.chatList.slice(-6);
       this.inputText = '';
+      this.showMessage(`成功: プロンプト送信`);
 
       try {
         const response = await fetch('/api/postMessage', {
@@ -217,7 +230,7 @@ function bodyData() {
 
       } catch (error) {
         console.error('Error:', error);
-        alert(error.message);
+        this.showMessage(`失敗: 通信エラー`);
       }
     },
     switchMobileMode() {
