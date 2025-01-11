@@ -97,7 +97,17 @@ function bodyData() {
       window.addEventListener('load', async () => {
         window.initializeMermaid();
         this.updateDiagram();
+        await this.fetchTagItemList();  // Fetch tag item list on initialization
       });
+    },
+    async fetchTagItemList() {
+      try {
+        const response = await fetch('/api/getTagItemList');
+        const data = await response.json();
+        this.tagItemList = data.result;
+      } catch (error) {
+        console.error('Error fetching tag item list:', error);
+      }
     },
     async fetchHistoryList() {
       try {

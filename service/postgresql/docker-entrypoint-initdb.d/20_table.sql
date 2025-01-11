@@ -2,7 +2,8 @@
 
 create table chat_info.tag_list (
   tag_id varchar(36) primary key,
-  tag_title varchar(256) not null
+  tag_title varchar(256) not null,
+  is_visible boolean not null default true
 );
 grant all privileges on chat_info.tag_list to xl_admin;
 
@@ -28,7 +29,6 @@ create table chat_info.tag_chat_list (
   tag_id varchar(36) not null,
   chat_id varchar(36) not null,
   date_registered timestamp not null,
-  is_visible boolean not null default true,
   foreign key (tag_id) references chat_info.tag_list(tag_id),
   foreign key (chat_id) references chat_info.chat_history(chat_id),
   unique (tag_id, chat_id)

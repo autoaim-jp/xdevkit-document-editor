@@ -28,7 +28,7 @@ export const handleRegisterTag = async ({ tagTitle }) => {
 }
 
 export const handleTagItemList = async () => {
-  const query = 'SELECT * FROM chat_info.chat_history h LEFT JOIN chat_info.tag_list p ON h.tag_id = p.tag_id where h.is_visible = true order BY p.tag_id DESC;'
+  const query = 'SELECT tcl.tag_id, tcl.chat_id, tl.tag_title, ch.chat_title FROM chat_info.tag_chat_list tcl LEFT JOIN chat_info.tag_list tl ON tcl.tag_id = tl.tag_id left join chat_info.chat_history ch on tcl.chat_id = ch.chat_id where tl.is_visible = true and ch.is_visible = true order BY tcl.date_registered DESC;'
   const { result } = await execQuery({ query })
   
   const tagItemList = {}
