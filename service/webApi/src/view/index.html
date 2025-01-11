@@ -141,7 +141,7 @@
             <div class="flex flex-col gap-4">
               <template x-for="(message, index) in chatList" :key="index">
                 <!-- 外側のdivにflexと条件でjustify-end or justify-startを適用 -->
-                <div :class="message.role === 'user' ? 'flex justify-end' : 'flex justify-start'" @click="loadCodeBlock(index)">
+                <div :class="message.role === 'user' ? 'flex justify-end' : 'flex justify-start'" @dblclick="loadAndCopy(index)">
                   <!-- メッセージバブル -->
                   <div :class="message.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'" 
                         class="inline-block p-2 rounded-lg max-w-[70%]">

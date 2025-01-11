@@ -1,5 +1,5 @@
 function bodyData() {
-  return { 
+  return {
     diagram: `sequenceDiagram
            autonumber
            Alice->>John: Hello John, how are you?
@@ -27,7 +27,7 @@ function bodyData() {
     tagTitle: '',  // Add tagTitle property
     showModal: false,  // Add showModal property
     tagItemList: {},  // Add tagItemList to store tags
-    selectedTagId: '',  // Track selected tag ID 
+    selectedTagId: '',  // Track selected tag ID
     viewInfo: '',
 
     showMessage(message) {
@@ -62,7 +62,7 @@ function bodyData() {
 
       if(!confirm(`チャットを削除しますか？\n${chatTitle}`)) {
         return
-      } 
+      }
 
       try {
         const response = await fetch('/api/postDelete', {
@@ -98,24 +98,64 @@ function bodyData() {
         console.error('Error fetching history list:', error);
       }
     },
-    async loadCodeBlock(index) {
-      if (this.selectedContentIndex === index) {
-        return
+    getMermaidCode(content) {
+      const mermaidMatch = content.match(/```mermaid\n([\s\S]*?)\n```/);
+      if (mermaidMatch && mermaidMatch[1]) {
+        return mermaidMatch[1]
+      } else {
+        return null
       }
-      this.selectedContentIndex = index
+    },
+    async loadCodeBlock(index) {
       const { role, content } = this.chatList[index]
+
+      // 最新版でないならば世代情報更新
       if (index !== (this.chatList.length -1)) {
         const indexDiff = Math.floor(((this.chatList.length -1) - index) / 2)
         this.viewInfo = `${indexDiff}世代前の${role}`
       } else {
         this.viewInfo = ''
       }
-      const mermaidMatch = content.match(/```mermaid\n([\s\S]*?)\n```/);
-      console.log(mermaidMatch)
-      if (mermaidMatch) {
-        this.diagram = mermaidMatch[1];
-        this.updateDiagram();
+
+      const mermaidCode = this.getMermaidCode(content)
+      console.log({ mermaidCode })
+      if (mermaidCode !== null) {
+        this.diagram = mermaidCode;
+
+        // 選択行が変わったならばダイアグラム更新
+        if (this.selectedContentIndex !== index) {
+          this.selectedContentIndex = index
+          this.updateDiagram();
+        }
+
+        return true
+      } else {
+        this.showMessage('mermaidコードブロックが見つかりません');
       }
+
+      return false
+    },
+    async loadAndCopy(index) {
+      const isSuccessLoadCodeBlock = await this.loadCodeBlock(index)
+      if(!isSuccessLoadCodeBlock) {
+        return
+      }
+
+      if(!confirm(`コードブロックをコピーしますか？\n（現在コピーしているクリップボードテキストが消えます）`)) {
+        return
+      }
+
+      try {
+        await navigator.clipboard.writeText(this.diagram);
+        this.showMessage('クリップボードにコピーしました');
+      } catch (err) {
+        console.error('Error copying to clipboard:', err);
+        this.showMessage('失敗: クリップボードコピーできません');
+      }
+    },
+    async resetChatList(chatList) {
+      this.chatList = chatList;
+      this.selectedContentIndex = -1
     },
     async fetchChatList(chatId, chatTitle) {
       this.chatId = chatId
@@ -124,9 +164,7 @@ function bodyData() {
       try {
         const response = await fetch(`/api/getChatList?chatId=${chatId}`);
         const data = await response.json();
-        this.chatList = data.result;
-        this.selectedContentIndex = -1
-
+        this.resetChatList(data.result)
         this.loadCodeBlock(this.chatList.length - 1)
       } catch (error) {
         console.error('Error fetching chat list:', error);
@@ -175,18 +213,15 @@ function bodyData() {
         const botReply = { role: 'assistant', content: data.result.message };
         this.chatList.push(botReply);
 
-        const mermaidMatch = botReply.content.match(/```mermaid\n([\s\S]*?)\n```/);
-        if (mermaidMatch) {
-          this.diagram = mermaidMatch[1];
-          this.updateDiagram();
-        }
+        this.loadCodeBlock(this.chatList.length - 1)
+
       } catch (error) {
         console.error('Error:', error);
         alert(error.message);
       }
     },
     switchMobileMode() {
-      this.isMobileMode = !this.isMobileMode; 
+      this.isMobileMode = !this.isMobileMode;
       if (this.isMobileMode) {
         this.$refs.miniDisplayForm.classList.remove('hidden');
         this.$refs.chatUiContainer.classList.add('hidden');
