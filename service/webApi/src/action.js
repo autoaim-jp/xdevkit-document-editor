@@ -5,7 +5,7 @@ export const getHandlerTagChat = ({ handleTagChat }) => {
     const { tagId, chatId } = req.body
     console.log({ debug: true, request: 'registerChatInTag', tagId, chatId })
 
-    const result = await handleRegisterChatInTag({ tagId, chatId })
+    const result = await handleTagChat({ tagId, chatId })
 
     res.json({ result })
   }
@@ -14,9 +14,9 @@ export const getHandlerTagChat = ({ handleTagChat }) => {
 export const getHandlerRegisterTag = ({ handleRegisterTag }) => {
   return async (req, res) => {
     const { tagId, tagTitle } = req.body
-    console.log({ debug: true, request: 'addTag', tagId, tagTitle })
+    console.log({ debug: true, request: 'addTag', tagTitle })
 
-    const result = await handleAddTag({ tagId, tagTitle })
+    const result = await handleRegisterTag({ tagTitle })
 
     res.json({ result })
   }

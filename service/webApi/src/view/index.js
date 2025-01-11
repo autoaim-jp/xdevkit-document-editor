@@ -176,7 +176,7 @@ function bodyData() {
         const data = await response.json();
         this.resetChatList(data.result)
         this.loadCodeBlock(this.chatList.length - 1)
-         
+
         this.showMessage('成功: チャット読み込み');
       } catch (error) {
         console.error('Error fetching chat list:', error);
@@ -191,11 +191,29 @@ function bodyData() {
     scrollChatListContainer() {
       Alpine.nextTick(() => { this.$refs.chatListContainer.scrollTop = this.$refs.chatListContainer.scrollHeight })
     },
-    submitTag() {
-      this.showMessage(`成功: タグ作成 ${this.tagTitle}`);
-      this.tagTitle = ''; // Clear the input after submission
+    async submitTag() {
+      if (!this.tagTitle.trim()) {
+        this.showMessage('失敗: タグタイトルが未入力');
+        return;
+      }
+
       this.showModal = false; // Close the modal
+
+      try {
+        const response = await fetch('/api/registerTag', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tagTitle: this.tagTitle }),
+        });
+
+        this.tagTitle = '';
+        this.showMessage(`成功: タグ作成 ${this.tagTitle}`);
+      } catch (error) {
+        console.error('Error:', error);
+        this.showMessage('失敗: タグ作成エラー');
+      }
     },
+
     async sendMessage() {
       if (!this.inputText.trim()) return;
       const newMessage = { role: 'user', content: this.inputText };

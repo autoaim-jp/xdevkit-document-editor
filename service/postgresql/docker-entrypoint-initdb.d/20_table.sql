@@ -28,12 +28,10 @@ create table chat_info.tag_chat_list (
   tag_id varchar(36) not null,
   chat_id varchar(36) not null,
   date_registered timestamp not null,
+  is_visible boolean not null default true,
   foreign key (tag_id) references chat_info.tag_list(tag_id),
   foreign key (chat_id) references chat_info.chat_history(chat_id),
   unique (tag_id, chat_id)
 );
 grant all privileges on chat_info.tag_chat_list to xl_admin;
 
--- 既存のテーブルの変更
-alter table chat_info.chat_history
-  drop column tag_id;

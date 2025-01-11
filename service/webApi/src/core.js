@@ -18,7 +18,8 @@ export const handleTagChat = async ({ tagId, chatId }) => {
   return rowCount === 1? 'ok': 'ng'
 }
 
-export const handleRegisterTag = async ({ tagId, tagTitle }) => {
+export const handleRegisterTag = async ({ tagTitle }) => {
+  const tagId = mod.ulid()
   const paramList = [tagId, tagTitle]
   const query = 'insert into chat_info.tag_list (tag_id, tag_title) values ($1, $2)'
   const { result } = await execQuery({ query, paramList })
