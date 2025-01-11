@@ -14,6 +14,7 @@ function bodyData() {
     inputText: '',
     selectedModel: '4o',
     chatId: null,
+    chatTitle: 'New Chat',
     chatList: [],
     chatHistoryList: [],
     menuOpen: false,
@@ -95,8 +96,10 @@ function bodyData() {
         console.error('Error fetching history list:', error);
       }
     },
-    async fetchChatList(chatId) {
+    async fetchChatList(chatId, chatTitle) {
       this.chatId = chatId
+      this.chatTitle = chatTitle
+
       try {
         const response = await fetch(`/api/getChatList?chatId=${chatId}`);
         const data = await response.json();

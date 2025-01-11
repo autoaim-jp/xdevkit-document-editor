@@ -1,9 +1,9 @@
 <!DOCTYPE HTML>
 <!-- Mermaid rendering with Alpine.js and UI adjustment -->
-<html lang='ja'>
+<html lang='ja' x-data="bodyData()">
   <head>
     <meta charset='UTF-8'>
-    <title>Mermaid Render with Alpine.js</title>
+    <title x-text="chatTitle">Mermaid Render with Alpine.js</title>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <script src='https://cdn.tailwindcss.com'></script>
     <script src='https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js' defer></script>
@@ -26,7 +26,7 @@
     </script>
     <script src='/index.js'></script>
   </head>
-  <body class='bg-gray-100 font-sans' x-data="bodyData()" x-init='init()'>
+  <body class='bg-gray-100 font-sans' x-init='init()'>
     <!-- Notification Message -->
     <div x-show="showNotification"
          class="fixed top-4 right-4 bg-blue-500 text-white py-2 px-4 rounded transition-opacity duration-500 z-50" 
@@ -46,6 +46,11 @@
     </div>
 
     <div class="relative h-screen">
+      <!-- Header with Chat Title -->
+      <header class="absolute bg-gray-500 text-white rounded p-4 m-1">
+        <h1 x-text="chatTitle" class="text-xl font-bold"></h1>
+      </header>
+
       <div class="absolute bottom-20 left-2 flex flex-col space-y-2">
         <!-- Menu Button -->
         <button @click="menuOpen = !menuOpen" class="bg-gray-300 p-2 rounded-full">
@@ -56,8 +61,8 @@
 
         <!-- UI Toggle Button -->
         <button 
-                                                                 @click="switchMobileMode()"
-                                                                 class="bg-gray-300 p-2 rounded-full">
+          @click="switchMobileMode()"
+          class="bg-gray-300 p-2 rounded-full">
           <template x-if="isMobileMode">
             <!-- Icon for PC Mode -->
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -89,7 +94,7 @@
           <template x-for="(item, index) in chatHistoryList" :key="index">
             <li class="mb-2 flex justify-between items-center">
               <!-- メインボタン -->
-              <button @click="fetchChatList(item.chatId); menuOpen = false;" class="text-blue-600 hover:underline overflow-y-auto text-left" x-text="item.chatTitle"></button>
+              <button @click="fetchChatList(item.chatId, item.chatTitle); menuOpen = false;" class="text-blue-600 hover:underline overflow-y-auto text-left" x-text="item.chatTitle"></button>
               <!-- 三点ドットボタン -->
               <div class="relative">
                 <button @click="togglePopup(index)" class="text-gray-500 hover:text-gray-700">
@@ -124,7 +129,7 @@
       </div>
 
       <!-- Main Content -->
-      <div class="flex h-full">
+      <div class="flex h-full"> <!-- Adjusted margin for the absolute header -->
         <!-- Chat UI -->
         <div x-ref="chatUiContainer" class="w-1/2 h-screen p-4 bg-white border-r flex flex-col">
           <div class="flex-grow overflow-y-auto" x-ref="chatListContainer" x-init="$watch('chatList', () => { scrollChatListContainer() })">
@@ -144,28 +149,28 @@
           </div>
 
           <div class="mt-4 flex">
-            <select x-model="selectedModel" class="border rounded p-2 mr-2">
+            <select x-model="selectedModel" class="border rounded p-1 m-1 text-xs">
               <option value="4o">4o</option>
               <option value="o1">o1</option>
             </select>
-          <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage" class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
-          <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Send</button>
+            <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage" class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
+            <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Send</button>
+          </div>
         </div>
-      </div>
 
-      <!-- Mermaid Display -->
-      <div x-ref="mermaidUiContainer" class="w-1/2 h-screen overflow-y-auto">
-        <div id="svgContainer" class="bg-gray-50 border p-4 rounded-lg flex justify-center"></div>
-        <div x-ref="miniDisplayForm" class="mt-4 flex hidden">
-          <select x-model="selectedModel" class="border rounded p-2 mr-2">
-            <option value="4o">4o</option>
-            <option value="o1">o1</option>
-          </select>
-          <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage" class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
-          <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Send</button>
+        <!-- Mermaid Display -->
+        <div x-ref="mermaidUiContainer" class="w-1/2 h-screen overflow-y-auto">
+          <div id="svgContainer" class="bg-gray-50 border p-4 rounded-lg flex justify-center"></div>
+          <div x-ref="miniDisplayForm" class="mt-4 flex hidden">
+            <select x-model="selectedModel" class="border rounded p-1 m-1 text-xs">
+              <option value="4o">4o</option>
+              <option value="o1">o1</option>
+            </select>
+            <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage" class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
+            <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Send</button>
+          </div>
         </div>
       </div>
-    </div>
     </div>
   </body>
 </html>
