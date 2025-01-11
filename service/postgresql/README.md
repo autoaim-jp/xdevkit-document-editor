@@ -29,4 +29,5 @@
 # rotate_backup.sh
 
 2世代以前のバックアップがold/にある。この中の7日より前に作成したファイルを削除。rotate_backup.shで指定。  
-`/path/to/xdevkit-document-editor/.xdevkit/backup/data/latest/backup_コンテナ名_DB名_日時.sql`
+`/path/to/xdevkit-document-editor/.xdevkit/backup/data/old/backup_コンテナ名_DB名_日時.sql`
+
