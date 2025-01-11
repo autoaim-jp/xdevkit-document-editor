@@ -13,7 +13,7 @@ mkdir -p $LOG_DIR_PATH
 BACKUP_FILE_PREFIX="backup_${CONTAINER_NAME}_${DB_NAME}_"
 LOG_FILE_PATH="${LOG_DIR_PATH}rotate.log"
 
-RETENTION_DAY_N=3
+RETENTION_DAY_N=7
 
 FILE_LIST=$(find "${OLD_BACKUP_DATA_DIR_PATH}" -type f -name "${BACKUP_FILE_PREFIX}*" -mtime +${RETENTION_DAY_N} -exec ls -la {} \;)
 
