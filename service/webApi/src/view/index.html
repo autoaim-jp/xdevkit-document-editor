@@ -26,7 +26,7 @@
     </script>
     <script src='/index.js'></script>
   </head>
-  <body class='bg-gray-100 font-sans' x-init='init()'>
+  <body class='bg-gray-100 font-sans' x-init='bodyInit'>
     <!-- Notification Message -->
     <div x-show="showNotification"
          class="fixed top-4 ml-2 right-4 bg-blue-500 text-white py-2 px-4 rounded transition-opacity duration-500 z-50"
@@ -84,7 +84,7 @@
       </div>
 
       <!-- Side Menu -->
-      <div x-show="menuOpen" class="absolute inset-y-0 left-0 w-80 bg-gray-200 p-4 border-r overflow-y-auto" @click.away="menuOpen = false" x-init="fetchHistoryList">
+      <div x-show="menuOpen" class="absolute inset-y-0 left-0 w-80 bg-gray-200 p-4 border-r overflow-y-auto" @click.away="menuOpen = false">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-bold">タグ</h2>
           <button @click="addTag()" class="text-green-500 hover:text-green-700">
@@ -123,7 +123,7 @@
                         <option :value="tagId" x-text="tag.tagTitle"></option>
                       </template>
                     </select>
-                    <button @click="updateTag()" class="mt-2 w-full bg-green-500 text-white py-2 rounded">タグを更新</button>
+                    <button @click="tagChat(item.chatId, item.chatTitle)" class="mt-2 w-full bg-green-500 text-white py-2 rounded">タグを更新</button>
                   </div>
 
                 </div>

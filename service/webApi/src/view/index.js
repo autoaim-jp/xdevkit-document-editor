@@ -32,16 +32,16 @@ function bodyData() {
     viewInfo: '',
 
     showMessage(message) {
-      this.notificationMessage = message;
-      this.showNotification = true;
-      setTimeout(() => this.showNotification = false, 5 * 1000);  // Hide after 5 seconds
+      this.notificationMessage = message
+      this.showNotification = true
+      setTimeout(() => this.showNotification = false, 5 * 1000)  // Hide after 5 seconds
     },
     togglePopup(index) {
-      this.popupIndex = this.popupIndex === index ? null : index;
+      this.popupIndex = this.popupIndex === index ? null : index
     },
     async renameChat(chatId, chatTitle) {
-      this.popupIndex = null; // ポップアップを閉じる
-      if (!this.renameInput.trim()) return;
+      this.popupIndex = null // ポップアップを閉じる
+      if (!this.renameInput.trim()) return
       const newChatTitle = this.renameInput
       this.renameInput = ''
 
@@ -50,17 +50,17 @@ function bodyData() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ chatId, oldChatTitle: chatTitle, newChatTitle }),
-        });
+        })
         this.fetchHistoryList()
-        this.showMessage(`成功: リネーム ${chatTitle} -> ${newChatTitle}`);
+        this.showMessage(`成功: リネーム ${chatTitle} -> ${newChatTitle}`)
       } catch (error) {
-        console.error('Error:', error);
-        alert(error.message);
+        console.error('Error:', error)
+        alert(error.message)
       }
     },
     async deleteChat(chatId, chatTitle) {
-      // this.chatHistoryList = this.chatHistoryList.filter(chat => chat.chatId !== chatId);
-      this.popupIndex = null; // ポップアップを閉じる
+      // this.chatHistoryList = this.chatHistoryList.filter(chat => chat.chatId !== chatId)
+      this.popupIndex = null // ポップアップを閉じる
 
       if(!confirm(`チャットを削除しますか？\n${chatTitle}`)) {
         return
@@ -71,9 +71,9 @@ function bodyData() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ chatId, chatTitle }),
-        });
+        })
         await this.fetchHistoryList()
-        this.showMessage(`成功: チャット削除 ${chatTitle}`);
+        this.showMessage(`成功: チャット削除 ${chatTitle}`)
 
         if(this.chatHistoryList.length === 0) {
           return
@@ -83,54 +83,56 @@ function bodyData() {
         const { chatId: latestChatId, chatTitle: latestChatTitle } = this.chatHistoryList[0]
         await this.fetchChatList(latestChatId, latestChatTitle)
       } catch (error) {
-        console.error('Error:', error);
-        alert(error.message);
+        console.error('Error:', error)
+        alert(error.message)
       }
     },
     updateDiagram() {
-      clearTimeout(this.timeout);
+      clearTimeout(this.timeout)
       this.timeout = setTimeout(() => {
-        renderMermaidDiagram(this.diagram, 'svgContainer');
-        this.showMessage('成功: ロードが完了');
-      }, 1000);
+        renderMermaidDiagram(this.diagram, 'svgContainer')
+        this.showMessage('成功: ロードが完了')
+      }, 1000)
     },
-    init() {
+    bodyInit() {
       window.addEventListener('load', async () => {
-        window.initializeMermaid();
-        this.updateDiagram();
-        await this.fetchTagItemList();
-        await this.fetchTagList(); // Fetch tag list on initialization
-      });
+        window.initializeMermaid()
+        this.updateDiagram()
+      })
+
+      this.fetchHistoryList()
+      this.fetchTagList()
+      this.fetchTagItemList()
     },
     async fetchTagItemList() {
       try {
-        const response = await fetch('/api/getTagItemList');
-        const data = await response.json();
-        this.tagItemList = data.result;
+        const response = await fetch('/api/getTagItemList')
+        const data = await response.json()
+        this.tagItemList = data.result
       } catch (error) {
-        console.error('Error fetching tag item list:', error);
+        console.error('Error fetching tag item list:', error)
       }
     },
     async fetchTagList() {
       try {
-        const response = await fetch('/api/getTagList');
-        const data = await response.json();
-        this.tagList = data.result;
+        const response = await fetch('/api/getTagList')
+        const data = await response.json()
+        this.tagList = data.result
       } catch (error) {
-        console.error('Error fetching tag list:', error);
+        console.error('Error fetching tag list:', error)
       }
     },
     async fetchHistoryList() {
       try {
-        const response = await fetch('/api/getchatHistory?chatIdBefore=');
-        const data = await response.json();
-        this.chatHistoryList = data.result;
+        const response = await fetch('/api/getchatHistory?chatIdBefore=')
+        const data = await response.json()
+        this.chatHistoryList = data.result
       } catch (error) {
-        console.error('Error fetching history list:', error);
+        console.error('Error fetching history list:', error)
       }
     },
     getMermaidCode(content) {
-      const mermaidMatch = content.match(/```mermaid\n([\s\S]*?)\n```/);
+      const mermaidMatch = content.match(/```mermaid\n([\s\S]*?)\n```/)
       if (mermaidMatch && mermaidMatch[1]) {
         return mermaidMatch[1]
       } else {
@@ -151,17 +153,17 @@ function bodyData() {
       const mermaidCode = this.getMermaidCode(content)
       console.log({ mermaidCode })
       if (mermaidCode !== null) {
-        this.diagram = mermaidCode;
+        this.diagram = mermaidCode
 
         // 選択行が変わったならばダイアグラム更新
         if (this.selectedContentIndex !== index) {
           this.selectedContentIndex = index
-          this.updateDiagram();
+          this.updateDiagram()
         }
 
         return true
       } else {
-        this.showMessage('失敗: mermaidコードブロックが見つかりません');
+        this.showMessage('失敗: mermaidコードブロックが見つかりません')
       }
 
       return false
@@ -177,15 +179,15 @@ function bodyData() {
       }
 
       try {
-        await navigator.clipboard.writeText(this.diagram);
-        this.showMessage('成功: クリップボードにコピー');
+        await navigator.clipboard.writeText(this.diagram)
+        this.showMessage('成功: クリップボードにコピー')
       } catch (err) {
-        console.error('Error copying to clipboard:', err);
-        this.showMessage('失敗: クリップボードコピーできません');
+        console.error('Error copying to clipboard:', err)
+        this.showMessage('失敗: クリップボードコピーできません')
       }
     },
     async resetChatList(chatList) {
-      this.chatList = chatList;
+      this.chatList = chatList
       this.selectedContentIndex = -1
     },
     async fetchChatList(chatId, chatTitle) {
@@ -193,56 +195,81 @@ function bodyData() {
       this.chatTitle = chatTitle
 
       try {
-        const response = await fetch(`/api/getChatList?chatId=${chatId}`);
-        const data = await response.json();
+        const response = await fetch(`/api/getChatList?chatId=${chatId}`)
+        const data = await response.json()
         this.resetChatList(data.result)
         this.loadCodeBlock(this.chatList.length - 1)
 
-        this.showMessage('成功: チャット読み込み');
+        this.showMessage('成功: チャット読み込み')
       } catch (error) {
-        console.error('Error fetching chat list:', error);
+        console.error('Error fetching chat list:', error)
       }
     },
     addTag() {
-      this.showModal = true;  // Open the modal
+      this.showModal = true  // Open the modal
     },
-    updateTag() {
-      this.showMessage('成功: タグ更新');
+    async tagChat(chatId, chatTitle) {
+      if (!this.selectedTagId || !chatId) {
+        this.showMessage('失敗: タグまたはチャットが未選択')
+        return
+      }
+
+      const currentTagId = this.selectedTagId
+
+      try {
+        const response = await fetch('/api/tagChat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tagId: this.selectedTagId, chatId: chatId }),
+        })
+
+        if (response.ok) {
+          this.showMessage(`成功: チャットにタグを追加 ${chatTitle} に ${this.tagList[currentTagId].tagTitle}`)
+        } else {
+          this.showMessage('失敗: タグ追加エラー')
+        }
+      } catch (error) {
+        console.error('Error:', error)
+        this.showMessage('失敗: タグ追加エラー')
+      }
+
+      // ポップアップとサイドメニューを消す
+      document.body.click()
     },
     scrollChatListContainer() {
       Alpine.nextTick(() => { this.$refs.chatListContainer.scrollTop = this.$refs.chatListContainer.scrollHeight })
     },
     async submitTag() {
       if (!this.tagTitle.trim()) {
-        this.showMessage('失敗: タグタイトルが未入力');
-        return;
+        this.showMessage('失敗: タグタイトルが未入力')
+        return
       }
 
-      this.showModal = false; // Close the modal
+      this.showModal = false // Close the modal
 
       try {
         const response = await fetch('/api/registerTag', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tagTitle: this.tagTitle }),
-        });
+        })
 
-        this.tagTitle = '';
-        this.showMessage(`成功: タグ作成 ${this.tagTitle}`);
+        this.tagTitle = ''
+        this.showMessage(`成功: タグ作成 ${this.tagTitle}`)
       } catch (error) {
-        console.error('Error:', error);
-        this.showMessage('失敗: タグ作成エラー');
+        console.error('Error:', error)
+        this.showMessage('失敗: タグ作成エラー')
       }
     },
 
     async sendMessage() {
-      if (!this.inputText.trim()) return;
-      const newMessage = { role: 'user', content: this.inputText };
-      this.chatList.push(newMessage);
+      if (!this.inputText.trim()) return
+      const newMessage = { role: 'user', content: this.inputText }
+      this.chatList.push(newMessage)
 
-      const messagesToSend = this.chatList.slice(-6);
-      this.inputText = '';
-      this.showMessage(`成功: プロンプト送信`);
+      const messagesToSend = this.chatList.slice(-6)
+      this.inputText = ''
+      this.showMessage(`成功: プロンプト送信`)
 
       try {
         const response = await fetch('/api/postMessage', {
@@ -253,35 +280,35 @@ function bodyData() {
             chatList: messagesToSend,
             selectedModel: this.selectedModel
           }),
-        });
+        })
 
-        const data = await response.json();
+        const data = await response.json()
         if (this.chatId !== data.result.chatId) {
           this.chatId = data.result.chatId
           this.fetchHistoryList()
           console.log('reload history list', this.chatId)
         }
 
-        const botReply = { role: 'assistant', content: data.result.message };
-        this.chatList.push(botReply);
+        const botReply = { role: 'assistant', content: data.result.message }
+        this.chatList.push(botReply)
 
         this.loadCodeBlock(this.chatList.length - 1)
 
       } catch (error) {
-        console.error('Error:', error);
-        this.showMessage(`失敗: 通信エラー`);
+        console.error('Error:', error)
+        this.showMessage(`失敗: 通信エラー`)
       }
     },
     switchMobileMode() {
-      this.isMobileMode = !this.isMobileMode;
+      this.isMobileMode = !this.isMobileMode
       if (this.isMobileMode) {
-        this.$refs.miniDisplayForm.classList.remove('hidden');
-        this.$refs.chatUiContainer.classList.add('hidden');
-        this.$refs.mermaidUiContainer.classList.replace('w-1/2', 'w-full');
+        this.$refs.miniDisplayForm.classList.remove('hidden')
+        this.$refs.chatUiContainer.classList.add('hidden')
+        this.$refs.mermaidUiContainer.classList.replace('w-1/2', 'w-full')
       } else {
-        this.$refs.miniDisplayForm.classList.add('hidden');
-        this.$refs.chatUiContainer.classList.remove('hidden');
-        this.$refs.mermaidUiContainer.classList.replace('w-full', 'w-1/2');
+        this.$refs.miniDisplayForm.classList.add('hidden')
+        this.$refs.chatUiContainer.classList.remove('hidden')
+        this.$refs.mermaidUiContainer.classList.replace('w-full', 'w-1/2')
       }
     }
   }
