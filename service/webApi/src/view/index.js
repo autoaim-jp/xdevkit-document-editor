@@ -10,9 +10,108 @@ function bodyData() {
            John-->>Alice: Great!
            John->>Bob: How about you?
            Bob-->>John: Jolly good!`,
-    timeout: null,
+    promptTemplateList: {
+
+      /* ======================================== */
+      mind: `情報を整理したい。
+メモをもとに、フォーマットに従い、mermaidのmindmapで出力して。
+
+# フォーマット
+\`\`\`mermaid
+%% ルール: idはアルファベットとハイフンを自動採番、ラベルは("id: 値")。このルールコメントは消してはいけない。
+mindmap
+  root("root: 〇〇")
+    a("a: 〇〇")
+      a-a("a-a: 〇〇")
+      a-b("a-b: 〇〇")
+    b("b: 〇〇")
+\`\`\`
+
+# メモ
+`,
+
+      /* ======================================== */
+
+      flow: `情報を整理したい。
+下書きをフォーマットに従うようにしたい。mermaidのflowchartで出力して。
+
+# フォーマット
+\`\`\`mermaid
+%% ルール: ルールコメントは消してはいけない。
+%% ルール: subgraphのidはアルファベットとハイフンを自動採番
+%% ルール: ノードのidはアルファベットとハイフンと数字を自動採番
+%% ルール: 全てのラベルは["id: 値"]または|""|にする
+flowchart LR
+  subgraph a["a: ○○"]
+    subgraph a-a["a-a: ○○"]
+      a-a-1["a-a-1: ○○"]
+      a-a-2["a-a-2: ○○"]
+    end
+    subgraph a-b["a-b: ○○"]
+      a-b-1["a-b-1: ○○"]
+    end
+
+    %% arrow
+    a-a-1 --> |"○○"|a-b-1
+  end
+
+  subgraph b["b: ○○"]
+    subgraph b-a["b-a: ○○"]
+      subgraph b-a-a["b-a-a: ○○"]
+        b-a-a-1["b-a-a-1: ○○"]
+        b-a-a-2["b-a-a-2: ○○"]
+      end
+    end  
+
+   %% arrow
+
+  end
+\`\`\`
+
+# メモ
+`,
+
+      /* ======================================== */
+
+      seq: `情報を整理したい。
+メモを参考に、フォーマットに従ってmermaidのsequenceDiagramを出力して。
+
+# フォーマット
+\`\`\`mermaid
+%% ルール: 各エンティティには個別の役割を与え、対話を詳細に定義。コメントは消さずに参考にしてください。
+sequenceDiagram
+    autonumber
+    actor エンティティA as DescriptionA
+    participant エンティティB as DescriptionB
+    participant エンティティC as DescriptionC
+    participant エンティティD as DescriptionD
+
+    エンティティA->>エンティティB: メッセージの詳細内容
+    note over エンティティB: エンティティBの処理や<br/>状態変化に関する説明
+    
+    エンティティB->>エンティティC: データ送信や命令の説明
+    note over エンティティC: 処理の開始やデータ受信
+
+    エンティティC->>エンティティD: 関数呼び出し等の説明
+    エンティティD-->>エンティティC: 呼び出し結果やレスポンスの詳細
+    
+    alt 条件X
+        エンティティC->>エンティティA: 条件Xが真の場合の処理
+    else 条件Y
+        エンティティC-->>エンティティA: 条件Yが真の場合の処理
+    end
+
+    note right of エンティティA: 結果の保存や<br/>後続処理に関するコメント
+\`\`\`
+
+# メモ
+`,
+    },
+    diagramTimeout: null,
+    messageTimeout: null,
     inputText: '',
     selectedModel: '4o',
+    selectedTemplate: '',
     chatId: null,
     chatTitle: 'New Chat',
     chatList: [],
@@ -34,12 +133,26 @@ function bodyData() {
     viewInfo: '',
 
     showMessage(message) {
+      clearTimeout(this.messageTimeout)
       this.notificationMessage = message
       this.showNotification = true
-      setTimeout(() => this.showNotification = false, 5 * 1000)  // Hide after 5 seconds
+      this.messageTimeout = setTimeout(() => this.showNotification = false, 5 * 1000)  // Hide after 5 seconds
     },
     togglePopup(index) {
       this.popupIndex = this.popupIndex === index ? null : index
+    },
+
+    loadPromptTemplate() {
+      const promptTemplate = this.promptTemplateList[this.selectedTemplate]
+      if(!promptTemplate) {
+        return
+      }
+      if (!confirm('テンプレートを先頭に追加しますか？')) {
+        return
+      }
+
+      this.inputText = promptTemplate + this.inputText
+      this.showMessage(`成功: テンプレート呼び出し${this.selectedTemplate}`)
     },
 
     async renameChat(chatId, chatTitle) {
@@ -101,8 +214,8 @@ function bodyData() {
     },
 
     updateDiagram() {
-      clearTimeout(this.timeout)
-      this.timeout = setTimeout(() => {
+      clearTimeout(this.diagramTimeout)
+      this.diagramTimeout = setTimeout(() => {
         renderMermaidDiagram(this.diagram, 'svgContainer')
         this.showMessage('成功: ロードが完了')
       }, 1000)
