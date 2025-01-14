@@ -119,7 +119,7 @@
               <ul class='ml-2'>
                 <template x-for="history in item.historyList" :key="history.chatId">
                   <li class="flex justify-between items-center mb-2">
-                    <button class="text-blue-600 hover:underline" @click="fetchChatList(history.chatId, history.chatTitle)">
+                    <button class="text-blue-600 hover:underline text-left" @click="fetchChatList(history.chatId, history.chatTitle)">
                       <span x-text="history.chatTitle"></span>
                     </button>
                     <div class="relative">
@@ -212,7 +212,7 @@
               <option value="o1">o1</option>
             </select>
             <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage" class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
-            <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Send</button>
+            <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" :disabled="isSending">Send</button>
           </div>
         </div>
 
@@ -232,4 +232,3 @@
     </div>
   </body>
 </html>
-

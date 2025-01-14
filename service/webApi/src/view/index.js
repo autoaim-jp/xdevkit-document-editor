@@ -21,6 +21,7 @@ function bodyData() {
     menuOpen: false,
     isMobileMode: false,
     popupIndex: null,
+    isSending: false,  // Add isSending state
     renameInput: '',
     tagRenameInput: '',
     notificationMessage: '',  // Add this property for the message text
@@ -282,7 +283,8 @@ function bodyData() {
     },
 
     async sendMessage() {
-      if (!this.inputText.trim()) return
+      if (!this.inputText.trim() || this.isSending) return
+      this.isSending = true
       const newMessage = { role: 'user', content: this.inputText }
       this.chatList.push(newMessage)
 
@@ -307,6 +309,7 @@ function bodyData() {
           this.fetchHistoryList()
           console.log('reload history list', this.chatId)
         }
+        this.isSending = false
 
         const botReply = { role: 'assistant', content: data.result.message }
         this.chatList.push(botReply)
@@ -316,6 +319,7 @@ function bodyData() {
       } catch (error) {
         console.error('Error:', error)
         this.showMessage(`失敗: 通信エラー`)
+        this.isSending = false
       }
     },
     switchMobileMode() {
@@ -332,4 +336,3 @@ function bodyData() {
     }
   }
 }
-
