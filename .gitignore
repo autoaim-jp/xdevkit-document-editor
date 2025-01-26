@@ -1,4 +1,6 @@
 .env
+.xdevkit/
+log/
 node_modules/
 .*.swp
 
