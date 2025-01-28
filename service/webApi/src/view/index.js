@@ -1,15 +1,8 @@
 function bodyData() {
   return {
-    diagram: `sequenceDiagram
-           autonumber
-           Alice->>John: Hello John, how are you?
-           loop HealthCheck
-           John->>John: Fight against hypochondria
-           end
-           Note right of John: Rational thoughts!
-           John-->>Alice: Great!
-           John->>Bob: How about you?
-           Bob-->>John: Jolly good!`,
+    diagram: `flowchart
+    チャット内にダイアグラムの記述が見つかりません
+           `,
     promptTemplateList: {
 
       /* ======================================== */
@@ -108,6 +101,36 @@ sequenceDiagram
 
 # メモ
 `,
+
+      /* ======================================== */
+      gantt: `情報を整理したい。
+フォーマットに従い、mermaidのganttで出力して。
+
+# フォーマット
+\`\`\`mermaid
+gantt
+    title タイトル
+    dateFormat  YYYY-MM-DD
+    excludes weekends
+    section マイルストーン
+    要件定義の期限     :milestone, 2025-02-06, 1d
+    設計の期限         :milestone, 2025-02-27, 1d
+    section Group1
+    Task in sec      :a1, 2025-01-18  , 7d
+    another task      : after a1, 7d
+    section Group2
+    Task in sec      :b1, 2025-02-07  , 4d
+    another task      : after b1, 9d
+
+\`\`\`
+
+# 目的
+
+# メモ
+`,
+
+      /* ======================================== */
+
     },
     diagramTimeout: null,
     messageTimeout: null,
