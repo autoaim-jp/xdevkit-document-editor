@@ -1,9 +1,14 @@
 # xdevkit-document-editor
 
-# tree
+## 操作デモ
+
+[https://youtu.be/jWKHbTzEF2M](https://youtu.be/jWKHbTzEF2M)
+
+## tree
 
 `tree -Fa --filesfirst -I ".git/|.xdevkit/|*.swp"`
 
+```
 ./
 ├── .gitignore
 ├── Makefile アプリの起動や停止。docker composeを実行。
@@ -36,4 +41,5 @@
             └── view/ フロントエンド資産
                 ├── editor.html mermaidをリアルタイムに反映するだけのエディタページ
                 └── index.html メインのページ。チャット機能、ライブビュー機能、過去チャット参照機能などがある。
+```
 
