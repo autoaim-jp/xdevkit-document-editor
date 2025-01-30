@@ -372,6 +372,7 @@ gantt
       }
       this.chatId = chatId
       this.chatTitle = chatTitle
+      this.menuOpen = false
 
       try {
         const response = await fetch(`/api/getChatList?chatId=${chatId}`)
