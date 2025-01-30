@@ -471,6 +471,15 @@ gantt
         this.$refs.chatUiContainer.classList.remove('hidden')
         this.$refs.mermaidUiContainer.classList.replace('w-full', 'w-1/2')
       }
-    }
+    },
+
+
+    toggleTagItem(tagId) {
+      if(this.tagItemList[tagId].isVisible) {
+        this.tagItemList[tagId].isVisible = false
+      } else {
+        this.tagItemList[tagId].isVisible = true
+      }
+    },
   }
 }
