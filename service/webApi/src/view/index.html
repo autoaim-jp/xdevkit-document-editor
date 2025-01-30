@@ -57,27 +57,36 @@
       </header>
 
       <div class="absolute bottom-20 left-2 flex flex-col space-y-2">
+        <!-- New Chat Button -->
+        <button @click="startNewChat(true)" class="bg-gray-300 p-2 rounded-full">
+          <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <line x1="12" y1="5" x2="12" y2="19" stroke="black" stroke-width="2" stroke-linecap="round"/>
+            <line x1="5" y1="12" x2="19" y2="12" stroke="black" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
         <!-- Menu Button -->
         <button @click="menuOpen = !menuOpen" class="bg-gray-300 p-2 rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 6.75h16.5m-16.5 6.75h16.5" />
           </svg>
         </button>
 
         <!-- UI Toggle Button -->
-        <button 
-                                                                 @click="switchMobileMode()"
-                                                                 class="bg-gray-300 p-2 rounded-full">
+        <button @click="switchMobileMode()" class="bg-gray-300 p-2 rounded-full">
           <template x-if="isMobileMode">
             <!-- Icon for PC Mode -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h18v18H3V3z" />
+            <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="18" height="12" rx="1" ry="1" stroke="black" fill="none" stroke-width="2"/>
+              <rect x="9" y="16" width="6" height="2" stroke="black" fill="none" stroke-width="2"/>
+              <rect x="6" y="18" width="12" height="2" stroke="black" fill="none" stroke-width="2"/>
             </svg>
           </template>
           <template x-if="!isMobileMode">
             <!-- Icon for Mobile Mode -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3h10.5c.69 0 1.25.56 1.25 1.25v15.5c0 .69-.56 1.25-1.25 1.25H6.75A1.25 1.25 0 015.5 19.75V4.25C5.5 3.56 6.06 3 6.75 3z" />
+            <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2" stroke="black" fill="none" stroke-width="2"/>
+              <circle cx="12" cy="18" r="1" fill="black"/>
             </svg>
           </template>
         </button>

@@ -1,8 +1,6 @@
 function bodyData() {
   return {
-    diagram: `flowchart
-    チャット内にダイアグラムの記述が見つかりません
-           `,
+    diagram: null,
     promptTemplateList: {
 
       /* ======================================== */
@@ -138,7 +136,7 @@ gantt
     selectedModel: '4o',
     selectedTemplate: '',
     chatId: null,
-    chatTitle: 'New Chat',
+    chatTitle: null,
     chatList: [],
     chatHistoryList: [],
     selectedContentIndex: -1,
@@ -254,6 +252,10 @@ gantt
       this.fetchHistoryList()
       this.fetchTagList()
       this.fetchTagItemList()
+
+      this.startNewChat(false)
+      const url = new URL(window.location.href)
+      this.fetchChatList(url.searchParams.get('chatId'), url.searchParams.get('chatTitle'))
     },
     async fetchTagItemList() {
       try {
@@ -348,7 +350,26 @@ gantt
       this.chatList = chatList
       this.selectedContentIndex = -1
     },
+    updateQueryParameter() {
+      const url = new URL(window.location.href)
+      if (url.searchParams.has("chatId")) {
+        url.searchParams.set("chatId", this.chatId)
+      } else {
+        url.searchParams.append("chatId", this.chatId)
+      }
+
+      if (url.searchParams.has("chatTitle")) {
+        url.searchParams.set("chatTitle", this.chatTitle)
+      } else {
+        url.searchParams.append("chatTitle", this.chatTitle)
+      }
+
+      window.history.pushState({}, "", url)
+    },
     async fetchChatList(chatId, chatTitle) {
+      if (chatId === null || chatTitle === null) {
+        return
+      }
       this.chatId = chatId
       this.chatTitle = chatTitle
 
@@ -357,6 +378,7 @@ gantt
         const data = await response.json()
         this.resetChatList(data.result)
         this.loadCodeBlock(this.chatList.length - 1)
+        this.updateQueryParameter()
 
         this.showMessage('成功: チャット読み込み')
       } catch (error) {
@@ -479,6 +501,21 @@ gantt
         this.tagItemList[tagId].isVisible = false
       } else {
         this.tagItemList[tagId].isVisible = true
+      }
+    },
+
+    startNewChat(isResetUrl) {
+      this.chatTitle = 'New Chat'
+      this.diagram = `flowchart
+    チャット内にダイアグラムの記述が見つかりません
+           `
+      this.updateDiagram()
+      this.resetChatList()
+
+      if(isResetUrl) {
+        const url = new URL(window.location.href)
+        url.search = ''
+        window.history.pushState({}, "", url)
       }
     },
   }
