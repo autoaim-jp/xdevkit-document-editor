@@ -18,8 +18,10 @@
         const container = document.getElementById(containerId);
         const { svg } = await mermaid.render('mermaidExample', diagram);
         container.innerHTML = svg;
+        return null
       } catch (error) {
         console.error('Error rendering Mermaid diagram:', error);
+        return error
       }
     };
     </script>
@@ -231,13 +233,17 @@
             </div>
 
             <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage" class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
-            <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" :disabled="isSending">Send</button>
+            <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" :class="isSending? 'bg-gray-300': ''" :disabled="isSending">Send</button>
           </div>
 
         </div>
 
         <!-- Mermaid Display -->
         <div x-ref="mermaidUiContainer" class="w-1/2 h-screen overflow-y-auto">
+          <div x-show='diagramRenderError' class='bg-gray-50 border p-4 rounded-lg flex flex-col'>
+            <p class='text-red-400 font-bold text-xl mb-2'>ダイアグラムのエラー<p>
+            <pre x-text='diagramRenderError'><pre>
+          </div>
           <div id="svgContainer" class="bg-gray-50 border p-4 rounded-lg flex justify-center"></div>
           <div x-ref="miniDisplayForm" class="mt-4 flex hidden">
             <div class="flex flex-col">
@@ -254,7 +260,7 @@
               </select>
           </div>
             <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage" class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
-            <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Send</button>
+            <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" :class="isSending? 'bg-gray-300': ''" :disabled="isSending">Send</button>
           </div>
         </div>
       </div>

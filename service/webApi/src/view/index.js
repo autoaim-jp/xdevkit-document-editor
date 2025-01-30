@@ -1,6 +1,7 @@
 function bodyData() {
   return {
     diagram: null,
+    diagramRenderError: '',
     promptTemplateList: {
 
       /* ======================================== */
@@ -238,8 +239,8 @@ gantt
 
     updateDiagram() {
       clearTimeout(this.diagramTimeout)
-      this.diagramTimeout = setTimeout(() => {
-        renderMermaidDiagram(this.diagram, 'svgContainer')
+      this.diagramTimeout = setTimeout(async () => {
+        this.diagramRenderError = await renderMermaidDiagram(this.diagram, 'svgContainer')
         this.showMessage('成功: ロードが完了')
       }, 1000)
     },
