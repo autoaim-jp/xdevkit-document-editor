@@ -194,6 +194,10 @@ gantt
         this.fetchHistoryList()
         this.fetchTagItemList()
         this.showMessage(`成功: チャットリネーム ${chatTitle} -> ${newChatTitle}`)
+        if (chatId === this.chatId) {
+          this.chatTitle = chatTitle
+          this.updateQueryParameter()
+        }
       } catch (error) {
         console.error('Error:', error)
         alert(error.message)
@@ -392,6 +396,7 @@ gantt
     },
     async tagChat(chatId, chatTitle) {
       if (!this.selectedTagId || !chatId) {
+        console.log(this.selectedTagId, chatId, chatTitle)
         this.showMessage('失敗: タグまたはチャットが未選択')
         return
       }
@@ -410,6 +415,7 @@ gantt
         } else {
           this.showMessage('失敗: タグ追加エラー')
         }
+        this.fetchTagItemList()
       } catch (error) {
         console.error('Error:', error)
         this.showMessage('失敗: タグ追加エラー')
@@ -470,6 +476,7 @@ gantt
           this.chatId = data.result.chatId
           this.fetchHistoryList()
           console.log('reload history list', this.chatId)
+          this.updateQueryParameter()
         }
         this.isSending = false
 
@@ -507,12 +514,13 @@ gantt
     },
 
     startNewChat(isResetUrl) {
+      this.chatId = null
       this.chatTitle = 'New Chat'
       this.diagram = `flowchart
     チャット内にダイアグラムの記述が見つかりません
            `
       this.updateDiagram()
-      this.resetChatList()
+      this.resetChatList([])
 
       if(isResetUrl) {
         const url = new URL(window.location.href)
