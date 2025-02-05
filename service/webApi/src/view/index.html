@@ -130,9 +130,9 @@
               <ul class='ml-2' x-show="item.isVisible">
                 <template x-for="history in item.historyList" :key="history.chatId">
                   <li class="flex justify-between items-center mb-2">
-                    <button class="text-blue-600 hover:underline text-left" @click="fetchChatList(history.chatId, history.chatTitle)">
+                    <a x-bind:href="'/?chatId=' + history.chatId + '&chatTitle=' + history.chatTitle" class="text-blue-600 hover:underline text-left" @click="fetchChatList(history.chatId, history.chatTitle)">
                       <span x-text="history.chatTitle"></span>
-                    </button>
+                    </a>
                     <div class="relative">
                       <button @click="togglePopup(tagId+':'+history.chatId)" class="text-gray-500 hover:text-gray-700">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -169,7 +169,7 @@
         <ul>
           <template x-for="(item, index) in chatHistoryList" :key="index">
             <li class="mb-2 flex justify-between items-center">
-              <button @click="fetchChatList(item.chatId, item.chatTitle)" class="text-blue-600 hover:underline overflow-y-auto text-left" x-text="item.chatTitle"></button>
+              <a x-bind:href="'/?chatId=' + item.chatId + '&chatTitle=' + item.chatTitle" @click="fetchChatList(item.chatId, item.chatTitle)" class="text-blue-600 hover:underline overflow-y-auto text-left" x-text="item.chatTitle"></a>
               <div class="relative">
                 <button @click="togglePopup(index)" class="text-gray-500 hover:text-gray-700">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

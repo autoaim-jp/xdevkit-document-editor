@@ -3,6 +3,7 @@
 CONTAINER_NAME="mermaid-chatgpt-editor-postgresql"
 DB_NAME="xl_db"
 DB_USER="postgres"
+BACKUP_HOST="crontransferbackup:~/${HOSTNAME}/${CONTAINER_NAME}/"
 
 GIT_ROOT_DIR_PATH="$(git rev-parse --show-toplevel)/"
 BACKUP_DATA_DIR_PATH="${GIT_ROOT_DIR_PATH}.xdevkit/backup/data/"
@@ -30,5 +31,11 @@ docker exec $CONTAINER_NAME pg_dump -U $DB_USER -Fc -c --if-exists -d $DB_NAME >
 echo "backup file: ${BACKUP_FILE_PATH}"
 
 echo $BACKUP_FILE_PATH >> $LOG_FILE_PATH
+
+# BACKUP_HOSTにバックアップを転送
+scp $BACKUP_FILE_PATH $BACKUP_HOST
+
+echo "scp $BACKUP_FILE_PATH $BACKUP_HOST" >> $LOG_FILE_PATH
+
 echo "log file: ${LOG_FILE_PATH}"
 
