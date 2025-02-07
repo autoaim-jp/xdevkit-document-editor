@@ -233,7 +233,7 @@
             </div>
 
             <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage" class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
-            <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" :class="isSending? 'bg-gray-300': ''" :disabled="isSending">Send</button>
+            <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded enabled:hover:bg-blue-600" :class="isSending? 'bg-gray-300': ''" :disabled="isSending">Send</button>
           </div>
 
         </div>
@@ -260,7 +260,7 @@
               </select>
           </div>
             <textarea x-model="inputText" @keydown.ctrl.enter="sendMessage" class="flex-1 border rounded p-2 mr-2" placeholder="mermaidで適当なフローチャートを作成して。"></textarea>
-            <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" :class="isSending? 'bg-gray-300': ''" :disabled="isSending">Send</button>
+            <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded enabled:hover:bg-blue-600" :class="isSending? 'bg-gray-300': ''" :disabled="isSending">Send</button>
           </div>
         </div>
       </div>
